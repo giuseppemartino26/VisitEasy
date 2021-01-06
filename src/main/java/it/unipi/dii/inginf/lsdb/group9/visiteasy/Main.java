@@ -7,6 +7,7 @@ public class Main {
 
     public static void main(String[] args) {
 
+        MongoManager mdb = new MongoManager();
         Scanner keyboard = new Scanner(System.in);
 
         while (true)
@@ -26,7 +27,7 @@ public class Main {
                         break;
 
                     case 2:
-                        System.out.println("Select a command: " +
+                        System.out.println("--USER--\nSelect a command: " +
                                 "\n1. Login" +
                                 "\n2. Sign up" +
                                 "\n\n0. Go back");
@@ -36,11 +37,27 @@ public class Main {
                             switch (option_user)
                             {
                                 case 1:
-                                    //Login();
+                                    // TODO Login();
                                     break;
 
+                                case 2: //SignUp
+                                    System.out.println("Insert the username");
+                                    String username = keyboard.next();
+                                    System.out.println("Insert the password");
+                                    String password = keyboard.next();
+                                    System.out.println("Insert your age");
+                                    int age = keyboard.nextInt();
+
+                                    if (!mdb.signup(username, password, age)){
+                                        System.out.println("The username is already used. Please choose another one.");
+                                    }else {System.out.println("Registration successful!");}
+                                    continue;
+
                                 case 0:
-                                    //SignUp();
+                                    continue;
+
+                                default:
+                                    System.out.println("insert a correct number");
                                     continue;
                             }
                         }catch (Exception e){
