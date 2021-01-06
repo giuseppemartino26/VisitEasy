@@ -1,5 +1,7 @@
 package it.unipi.dii.inginf.lsdb.group9.visiteasy;
 
+import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
+
 import  java.util.*;
 
 
@@ -40,21 +42,30 @@ public class Main {
                                     // TODO Login();
                                     break;
 
-                                case 2: //SignUp
-                                    System.out.println("Insert the username");
-                                    String username = keyboard.next();
-                                    System.out.println("Insert the password");
-                                    String password = keyboard.next();
-                                    System.out.println("Insert your age");
-                                    int age = keyboard.nextInt();
+                                case 2:
+                                    while (true) {
+                                        //SignUp
+                                        System.out.println("Insert the username");
+                                        String username = keyboard.next();
+                                        System.out.println("Insert the password");
+                                        String password = keyboard.next();
+                                        System.out.println("Insert your age");
+                                        int age = keyboard.nextInt();
 
-                                    if (!mdb.signup(username, password, age)){
-                                        System.out.println("The username is already used. Please choose another one.");
-                                    }else {System.out.println("Registration successful!");}
-                                    continue;
+                                        User user = new User(username, password, age);
+
+                                        if (!mdb.signup(user)) {
+                                            System.out.println("The username is already used. Please choose another one.");
+                                        } else {
+                                            System.out.println("Registration successful!");
+                                            break;
+                                        }
+                                    }
+
+
 
                                 case 0:
-                                    continue;
+                                    continue; //torna indietro alla pagina principale
 
                                 default:
                                     System.out.println("insert a correct number");

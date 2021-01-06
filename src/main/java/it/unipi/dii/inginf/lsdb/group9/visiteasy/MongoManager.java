@@ -14,9 +14,9 @@ public class MongoManager {
     MongoCollection<Document> users = db.getCollection("users");
 
 
-boolean signup (String username, String password, int age )
+boolean signup (User user )
 {
-    User user = new User(username,password,age);
+
     if (users.countDocuments(new Document("username",user.getUsername())) == 0) {
         Document doc = new Document("username", user.getUsername()).append("password", user.getPassword()).append("age", user.getAge());
         users.insertOne(doc);
