@@ -38,13 +38,29 @@ public class Main {
 
                             switch (option_user)
                             {
-                                case 1:
-                                    // TODO Login();
-                                    break;
+                                case 1: //LOGIN
+                                    while (true)
+                                    {
+                                        System.out.println("--LOGIN USER--\nInsert the username");
+                                        String username = keyboard.next();
+                                        System.out.println("Insert the password");
+                                        String password = keyboard.next();
 
-                                case 2:
-                                    while (true) {
-                                        //SignUp
+                                        User user = new User(username,password);
+                                        if (!mdb.login_user(user)){
+                                            System.out.println("Please retry");
+                                        }else {
+                                            System.out.println("OKKKKK");
+                                          //  System.out.println("la mia età è:"+user.getAge());
+                                            //TODO
+                                        }
+
+                                    }
+
+                                case 2: //SignUp
+                                    while (true)
+                                    {
+
                                         System.out.println("Insert the username");
                                         String username = keyboard.next();
                                         System.out.println("Insert the password");
@@ -54,7 +70,7 @@ public class Main {
 
                                         User user = new User(username, password, age);
 
-                                        if (!mdb.signup(user)) {
+                                        if (!mdb.signup_user(user)) {
                                             System.out.println("The username is already used. Please choose another one.");
                                         } else {
                                             System.out.println("Registration successful!");

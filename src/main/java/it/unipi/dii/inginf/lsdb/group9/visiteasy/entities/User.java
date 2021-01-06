@@ -6,11 +6,18 @@ public class User {
     private String password;
     private int age;
 
-    //COSTRUTTORE
-    public User(String username, String password, int age)
+    //COSTRUTTORI
+
+    public User(String username, String password)
     {
         this.username = username;
         this.password = password;
+
+    }
+
+    public User(String username, String password, int age)
+    {
+        this(username, password);
         this.age = age;
     }
 
@@ -26,6 +33,7 @@ public class User {
         return age;
     }
 
-
-
+    public void setAge(int age) {
+        this.age = age;
+    }
 }
