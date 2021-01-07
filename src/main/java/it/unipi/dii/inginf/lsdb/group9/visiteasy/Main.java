@@ -26,7 +26,7 @@ public class Main {
                 switch (option)
                 {
                     case 1:
-                        mdb.display_cities();
+                        
                         break;
 
                     case 2:
