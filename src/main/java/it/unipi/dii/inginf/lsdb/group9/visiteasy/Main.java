@@ -26,6 +26,7 @@ public class Main {
                 switch (option)
                 {
                     case 1:
+                        mdb.display_cities();
                         break;
 
                     case 2:
@@ -50,8 +51,21 @@ public class Main {
                                         if (!mdb.login_user(user)){
                                             System.out.println("Please retry");
                                         }else {
-                                            System.out.println("OKKKKK");
-                                          //  System.out.println("la mia età è:"+user.getAge());
+
+                                            System.out.println("Select the city and the specialization you are interested to");
+
+                                            System.out.println("CITIES CURRENTLY AVAIABLE:");
+                                            mdb.display_cities();
+
+                                            System.out.println("\nSPECIALIZATIONS CURRENTLY AVAIABLE:");
+                                            mdb.display_spec();
+
+                                            System.out.println("Insert the city");
+                                            String city = keyboard.next();
+
+                                            System.out.println("Insert the specialization");
+                                            String specialization = keyboard.next();
+
                                             //TODO
                                         }
 
