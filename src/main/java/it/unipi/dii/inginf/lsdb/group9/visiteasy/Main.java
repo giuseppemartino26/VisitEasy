@@ -2,7 +2,7 @@ package it.unipi.dii.inginf.lsdb.group9.visiteasy;
 
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Administrator;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
-
+import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Doctor;
 import  java.util.*;
 
 
@@ -27,7 +27,7 @@ public class Main {
                 switch (option)
                 {
                     case 1:
-                        
+
                         break;
 
                     case 2:
@@ -85,7 +85,7 @@ public class Main {
 
                                         User user = new User(username, password, age);
 
-                                        if (!mdb.signup_user(user)) {
+                                        if (!mdb.add_user(user)) {
                                             System.out.println("The username is already used. Please choose another one.");
                                         } else {
                                             System.out.println("Registration successful!");
@@ -107,7 +107,7 @@ public class Main {
                         }
 
 
-                    case 3:
+                    case 3: //ADMINISTRATOR
                         while(true) {
                             System.out.println("--LOGIN ADMINISTRATOR--\nInsert the username");
                             String username = keyboard.next();
@@ -139,12 +139,31 @@ public class Main {
                                 {
                                     case 1:
                                         //add an administrator
-                                        System.out.println("ok 1");
-                                        break;
-                                    case 2:
+                                        System.out.println("Insert the username");
+                                        String administratorUsername = keyboard.next();
+                                        System.out.println("Insert the password");
+                                        String administratorPassword = keyboard.next();
+                                        Administrator administratorAdd= new Administrator(administratorUsername, administratorPassword);
+                                        if (!mdb.add_administrator(administratorAdd)) {
+                                            System.out.println("The username is already used. Please choose another one.");
+                                        } else {
+                                            System.out.println("add successful!");
+                                            break;
+                                        }
+                                        case 2:
                                         //add a doctor
-                                        System.out.println("ok 2");
-                                        break;
+                                            /*
+                                            System.out.println("Insert the username");
+                                            String DoctorUsername = keyboard.next();
+                                            System.out.println("Insert the password");
+                                            String DoctorPassword = keyboard.next();
+                                            Doctor DoctorAdd= new Doctor(DoctorUsername, Doctorpassword, name, city, specialization, bio, address);
+                                            if (!mdb.add_doctor_by_administrator(DoctorAdd)) {
+                                                System.out.println("The username is already used. Please choose another one.");
+                                            } else {
+                                                System.out.println("add successful!");
+                                                break;
+                                            }*/
                                     case 3:
                                         //add a user
                                         while (true)
@@ -159,7 +178,7 @@ public class Main {
 
                                             User user = new User(usernameNew, passwordNew, age);
 
-                                            if (!mdb.add_new_user_by_administrator(user)) {
+                                            if (!mdb.add_user(user)) {
                                                 System.out.println("The username is already used. Please choose another one.");
                                             } else {
                                                 System.out.println("add successful!");
@@ -176,7 +195,17 @@ public class Main {
                                         break;
                                     case 6:
                                         //delete a user
-                                        System.out.println("ok 6");
+                                        System.out.println("Insert the username you want delete");
+                                        String usernameDelete = keyboard.next();
+                                        String passwordDelete = "ok";
+                                        int age4 = 1;
+                                        User userDelete = new User(usernameDelete, passwordDelete, age4);
+                                        if (!mdb.delete_user_by_the_administrator(userDelete)) {
+                                            System.out.println(" username not found. Please choose another one.");
+                                        } else {
+                                            System.out.println("username deleted successful!");
+                                            break;
+                                        }
                                         break;
                                     case 7:
                                         //update a user
@@ -185,8 +214,8 @@ public class Main {
                                             System.out.println("--ADMINISTRATOR--\nSelect a command: " +
                                                     "\n1. username" +
                                                     "\n2. password" +
-                                                    "\n3. age" +
-                                                    "\n4. add a new field" );
+                                                    "\n3. age"+
+                                                    "\n\n0. Go back");
                                         try{
                                         int option_administrator_modify_user = keyboard.nextInt();
 
@@ -195,39 +224,49 @@ public class Main {
                                             case 1:
                                                 //modify username user
                                                 System.out.println("Insert the username you want modify");
-
                                                 String usernameModify = keyboard.next();
                                                 System.out.println("Insert the new username");
                                                 String passwordNModify = keyboard.next();
-                                                int age = 1;
-                                                User user = new User(usernameModify, passwordNModify, age);
-                                                if (!mdb.update_user_by_the_administrator(user)) {
+                                                int age1 = 1;
+                                                User userUsername = new User(usernameModify, passwordNModify, age1);
+                                                if (!mdb.update_user_by_the_administrator(userUsername)) {
                                                     System.out.println(" username not found. Please choose another one.");
                                                      } else {
                                                          System.out.println("username updated successful!");
                                                         break;
                                                     }
                                             case 2:
+                                                //modify password user
+                                                System.out.println("Insert the username you want modify");
+                                                String usernameUpdate = keyboard.next();
+                                                System.out.println("Insert the new password");
+                                                String passwordUpdate = keyboard.next();
+                                                int age2 = 2;
+                                                User userPassword = new User(usernameUpdate, passwordUpdate, age2);
+                                                if (!mdb.update_user_by_the_administrator(userPassword)) {
+                                                    System.out.println(" username not found. Please choose another one.");
+                                                } else {
+                                                    System.out.println("password updated successful!");
+                                                    break;
+                                                }
                                             case 3:
-                                            case 4:
+                                                //modify age user
+                                                System.out.println("Insert the username you want modify");
+                                                String usernameUpAge = keyboard.next();
+                                                String passwordUpAge = "password";
+                                                int age3 = 3;
+                                                User userAge = new User(usernameUpAge, passwordUpAge, age3);
+                                                if (!mdb.update_user_by_the_administrator(userAge)) {
+                                                    System.out.println(" username not found. Please choose another one.");
+                                                } else {
+                                                    System.out.println("age updated successful!");
+                                                    break;
+                                                }
+                                            case 0:
+                                                //go back
+
+                                                break;
                                         }
-
-                                            //System.out.println("Insert the password");
-                                            //String passwordN = keyboard.next();
-                                            //System.out.println("Insert the age");
-                                            //int age = keyboard.nextInt();
-
-                                            //User user = new User(usernameN, passwordN, age);
-
-                                            //if (!mdb.add_new_user_by_administrator(user)) {
-                                              //  System.out.println("The username is already used. Please choose another one.");
-                                           // } else {
-                                           //     System.out.println("add successful!");
-                                            //    break;
-                                            //}
-                                       // }catch (Exception e){
-                                    //System.out.println("ERROR: insert a correct number.");
-                                    //continue;
                                             }catch (Exception e){
                                             System.out.println("ERROR--------");
                                             continue;}
