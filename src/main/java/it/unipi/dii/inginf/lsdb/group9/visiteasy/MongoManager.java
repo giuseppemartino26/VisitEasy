@@ -1,7 +1,10 @@
 package it.unipi.dii.inginf.lsdb.group9.visiteasy;
 
 import com.mongodb.client.*;
+
+import  java.util.*;
 import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.result.UpdateResult;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Administrator;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
 import org.bson.Document;
@@ -16,6 +19,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
+
 
 public class MongoManager {
 
@@ -92,7 +97,52 @@ public class MongoManager {
         Bson myGroup = Aggregates.group("$specialization");
         doctors.aggregate(Arrays.asList(myGroup)).forEach(printvalue);
     }
-    void populate_doctors_from_file(String path)
+
+    //ADD NEW USER BY ADMINISTRATOR
+    boolean add_new_user_by_administrator(User user)
+    {
+        if (users.countDocuments(new Document("username", user.getUsername())) == 0) {
+            Document doc = new Document("username", user.getUsername()).append("password", user.getPassword()).append("age", user.getAge());
+            users.insertOne(doc);
+            return true;
+        } else return false;
+    }
+    //UPDATE USER BY THE ADMINISTRATOR
+    boolean update_user_by_the_administrator(User user) {
+        Document result = users.find(eq("username", user.getUsername())).first();
+        try {
+            result.getString("username");
+        } catch (NullPointerException exception) {
+            System.out.println("The username does not exist");
+            return false;}
+
+            try {
+
+                //ho passato come parametro il nuovo username nel campo password
+                users.updateOne(eq("username", user.getUsername()), (Bson) set("username",user.getPassword() ));
+            }catch (NullPointerException ex) {
+                System.out.println("The username does not exist");
+                return false;
+
+
+        }
+        return true;
+    }
+
+
+
+
+    //ADD NEW DOCTOR BY ADMINISTRATOR
+   /* boolean add_new_doctor_by_administrator(Doctor doctor)
+    {
+        if (users.countDocuments(new Document("username", user.getUsername())) == 0) {
+            Document doc = new Document("username", user.getUsername()).append("password", user.getPassword()).append("age", user.getAge());
+            users.insertOne(doc);
+            return true;
+        } else return false;
+    }
+
+    /*void populate_doctors_from_file(String path)
     {
 
         List<Document> observationDocuments = new ArrayList<>();
@@ -127,4 +177,6 @@ public class MongoManager {
 
     public void populate_doctors_from_file() {
     }
-}
+    public void populate_users_from_file() {
+    }*/
+    }

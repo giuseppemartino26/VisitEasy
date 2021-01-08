@@ -126,9 +126,9 @@ public class Main {
                                         "\n2. add a doctor" +
                                         "\n3. add a user" +
                                         "\n4. delete a doctor" +
-                                        "\n5. modify a doctor" +
+                                        "\n5. update a doctor" +
                                         "\n6. delete a user" +
-                                        "\n7. modify a user" +
+                                        "\n7. update a user" +
                                         "\n8. populate db" +
                                         "\n\n0. Go back");
                         }
@@ -138,31 +138,108 @@ public class Main {
                                 switch (option_administrator)
                                 {
                                     case 1:
+                                        //add an administrator
                                         System.out.println("ok 1");
                                         break;
                                     case 2:
+                                        //add a doctor
                                         System.out.println("ok 2");
                                         break;
                                     case 3:
-                                        System.out.println("ok 3");
-                                        break;
+                                        //add a user
+                                        while (true)
+                                        {
+
+                                            System.out.println("Insert the username");
+                                            String usernameNew = keyboard.next();
+                                            System.out.println("Insert the password");
+                                            String passwordNew = keyboard.next();
+                                            System.out.println("Insert the age");
+                                            int age = keyboard.nextInt();
+
+                                            User user = new User(usernameNew, passwordNew, age);
+
+                                            if (!mdb.add_new_user_by_administrator(user)) {
+                                                System.out.println("The username is already used. Please choose another one.");
+                                            } else {
+                                                System.out.println("add successful!");
+                                                break;
+                                            }
+                                        }
                                     case 4:
+                                        //delete a doctor
                                         System.out.println("ok 4");
                                         break;
                                     case 5:
+                                        //update a doctor
                                         System.out.println("ok 5");
                                         break;
                                     case 6:
+                                        //delete a user
                                         System.out.println("ok 6");
                                         break;
                                     case 7:
-                                        System.out.println("ok 7");
-                                        break;
+                                        //update a user
+
+                                            System.out.println("what do you want to modify?");
+                                            System.out.println("--ADMINISTRATOR--\nSelect a command: " +
+                                                    "\n1. username" +
+                                                    "\n2. password" +
+                                                    "\n3. age" +
+                                                    "\n4. add a new field" );
+                                        try{
+                                        int option_administrator_modify_user = keyboard.nextInt();
+
+                                        switch (option_administrator_modify_user)
+                                        {
+                                            case 1:
+                                                //modify username user
+                                                System.out.println("Insert the username you want modify");
+
+                                                String usernameModify = keyboard.next();
+                                                System.out.println("Insert the new username");
+                                                String passwordNModify = keyboard.next();
+                                                int age = 1;
+                                                User user = new User(usernameModify, passwordNModify, age);
+                                                if (!mdb.update_user_by_the_administrator(user)) {
+                                                    System.out.println(" username not found. Please choose another one.");
+                                                     } else {
+                                                         System.out.println("username updated successful!");
+                                                        break;
+                                                    }
+                                            case 2:
+                                            case 3:
+                                            case 4:
+                                        }
+
+                                            //System.out.println("Insert the password");
+                                            //String passwordN = keyboard.next();
+                                            //System.out.println("Insert the age");
+                                            //int age = keyboard.nextInt();
+
+                                            //User user = new User(usernameN, passwordN, age);
+
+                                            //if (!mdb.add_new_user_by_administrator(user)) {
+                                              //  System.out.println("The username is already used. Please choose another one.");
+                                           // } else {
+                                           //     System.out.println("add successful!");
+                                            //    break;
+                                            //}
+                                       // }catch (Exception e){
+                                    //System.out.println("ERROR: insert a correct number.");
+                                    //continue;
+                                            }catch (Exception e){
+                                            System.out.println("ERROR--------");
+                                            continue;}
+
                                     case 8:
-                                        System.out.println("filling the database with doctors");
-                                         mdb.populate_doctors_from_file();
+                                        //populate db
+                                        //System.out.println("filling the database with doctors");
+                                         //mdb.populate_doctors_from_file();
+                                        break;
 
                                     case 0:
+                                        //go back
                                         System.out.println("ok 0");
                                         break;
                                 }
@@ -170,6 +247,7 @@ public class Main {
                                     System.out.println("ERROR: insert a correct number.");
                                     continue;
                             }
+                            //break;
 
                         }
 
