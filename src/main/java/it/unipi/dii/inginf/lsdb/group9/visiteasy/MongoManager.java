@@ -44,6 +44,15 @@ public class MongoManager {
         } else return false;
     }
 
+    boolean add_doctor(Doctor doctor)
+    {
+        if (users.countDocuments(new Document("username", doctor.getUsername())) == 0) {
+            Document doc = new Document("username", doctor.getUsername()).append("password", doctor.getPassword()).append("name", doctor.getName()).append("city", doctor.getCity()).append("bio", doctor.getBio()).append("specialization", doctor.getSpecialization()).append("address", doctor.getAddress()).append("price", doctor.getPrice());
+            users.insertOne(doc);
+            return true;
+        } else return false;
+    }
+
 
     boolean login_user(User user)
     {

@@ -14,6 +14,11 @@ public class Doctor {
 
     //COSTRUTTORI
 
+    public Doctor (String username, String password){
+        this.username=username;
+        this.password=password;
+    }
+
     public Doctor(String username, String password, String name, String city, String specialization, String bio, String address) {
         this.username = username;
         this.password = password;
@@ -29,6 +34,8 @@ public class Doctor {
         this.price = price;
     }
 
+
+
     public String getUsername(){
         return username;
     }
@@ -37,12 +44,28 @@ public class Doctor {
         return password;
     }
 
+    public String getName() { return name; }
+
+    public String getCity() { return city; }
+
+    public String getSpecialization() {
+        return specialization;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+
     public int getPrice(){
         return price;
     }
 
-    public void setPrice(int age) {
+    public void setPrice(int price) {
         this.price = price;
     }
 }
-
