@@ -69,6 +69,28 @@ public class MongoManager {
     }
 
 
+    boolean login_doctor(Doctor doctor)
+    {
+        Document result = users.find(eq("username", doctor.getUsername())).first();
+        try {
+            result.getString("username");
+        }catch (NullPointerException exception){
+            System.out.println("The username does not exist");
+            return false;
+        }
+
+        String psw = result.getString("password");
+        if (psw.equals(doctor.getPassword())) {
+            System.out.println("Correct credentials");
+            return true;
+        } else{
+            System.out.println("Incorrect password");
+            return false;
+        }
+
+    }
+
+
     boolean login_administrator(Administrator administrator){
         Document result = administrators.find(eq("username", administrator.getUsername())).first(); //salvo in "result" il documento il cui campo username è uguale a quello passato come parametro
         try {
