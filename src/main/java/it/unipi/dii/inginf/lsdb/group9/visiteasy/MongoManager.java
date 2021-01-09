@@ -4,19 +4,16 @@ import com.mongodb.client.*;
 
 import  java.util.*;
 import com.mongodb.client.model.Aggregates;
-import com.mongodb.client.result.UpdateResult;
+import com.mongodb.client.model.Updates;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Administrator;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Doctor;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Consumer;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -26,7 +23,7 @@ import static com.mongodb.client.model.Updates.set;
 public class MongoManager {
 
     MongoClient mongoClient = MongoClients.create();
-    MongoDatabase db = mongoClient.getDatabase("doctors");
+    MongoDatabase db = mongoClient.getDatabase("progetto");
     MongoCollection<Document> users = db.getCollection("users");
     MongoCollection<Document> doctors = db.getCollection("doctors");
     MongoCollection<Document> administrators = db.getCollection("administrator");
@@ -35,6 +32,8 @@ public class MongoManager {
     Consumer<Document> printvalue = document -> {System.out.println(document.getString("_id"));};
 
     Scanner keyboard = new Scanner(System.in);
+
+
     boolean add_user(User user)
     {
         if (users.countDocuments(new Document("username", user.getUsername())) == 0) {
@@ -86,8 +85,8 @@ public class MongoManager {
 
         return false;}
     }
-    // ADD ADMINISTRATOR BY ADMINISTRATOR
 
+    // ADD ADMINISTRATOR BY ADMINISTRATOR
 boolean add_administrator(Administrator administrator) {
 
     if (administrators.countDocuments(new Document("username", administrator.getUsername())) == 0) {
@@ -167,7 +166,8 @@ boolean add_administrator(Administrator administrator) {
         return true;
     }
 //DELETE USER
-    boolean delete_user_by_the_administrator(User user){
+    boolean delete_user_by_the_administrator(User user)
+    {
         Document result = users.find(eq("username", user.getUsername())).first();
         try {
             result.getString("username");
@@ -177,6 +177,46 @@ boolean add_administrator(Administrator administrator) {
         users.deleteOne(eq("username",user.getUsername()));
         return true;
     }
+
+      /* Restituisce una lista di date dalla data start a quella di end*/
+    public static List<DateTime> getDateRange(DateTime start, DateTime end)
+    {
+        List<DateTime> ret = new ArrayList<DateTime>();
+        DateTime tmp = start;
+        while (tmp.isBefore(end) || tmp.equals(end)) {
+            ret.add(tmp);
+            tmp = tmp.plusDays(1);
+        }
+        return ret;
+    }
+
+     /* Aggiunge il calendario al dottore che ha username = us dalla data che decide il dottore fino a 1 anno o quello che è     ( tutte le date hanno orari uguali che sceglie il dottore) */
+    void aggiungi_cal3(String us, String ora1, String ora2, String ora3, String start_date)
+    {
+       // DateTime start = DateTime.now().withTimeAtStartOfDay();
+        DateTime start = DateTime.parse(start_date);
+        DateTime end = start.plusYears(1);
+
+        List<DateTime> between = getDateRange(start, end);
+
+        for (DateTime d : between)
+        {
+            Document newdoc = new Document("date", d.toString(DateTimeFormat.shortDate())).append(ora1,"").append(ora2,"").append(ora3,"");
+            doctors.updateMany(eq("username",us), Updates.push("calendario",newdoc));
+        }
+    }
+
+    /*aggiunge un nuovo orario al calendario del dottore */
+    void aggiungi_ora(String username, String date, String newhour)
+    {
+        Document query = new Document("username",username).append("calendario.date",date);
+
+        Document updateQuery = new Document();
+        updateQuery.put("calendario.$."+newhour,"");
+        doctors.updateOne(query,new Document("$set",updateQuery));
+    }
+
+
 
 
     //ADD NEW DOCTOR BY ADMINISTRATOR
