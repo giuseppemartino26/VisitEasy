@@ -43,11 +43,11 @@ public class Main {
                                     while (true)
                                     {
                                         System.out.println("--LOGIN DOCTOR--\nInsert the username");
-                                        String username = keyboard.next();
+                                        String usernameD = keyboard.next();
                                         System.out.println("Insert the password");
-                                        String password = keyboard.next();
+                                        String passwordD = keyboard.next();
 
-                                        Doctor doctor = new Doctor(username,password);
+                                        Doctor doctor = new Doctor(usernameD,passwordD);
                                         if (!mdb.login_doctor(doctor)){
                                             System.out.println("Please retry");
                                         }else {
@@ -77,7 +77,7 @@ public class Main {
                                         System.out.println("Insert price for your visit");
                                         int price = keyboard.nextInt();
 
-                                        Doctor doctor = new Doctor(username, password, name, city, bio, specialization, address, price);
+                                        Doctor doctor = new Doctor(username, password, price, name, city, bio, specialization, address);
 
                                         if (!mdb.add_doctor(doctor)) {
                                             System.out.println("The username is already used. Please choose another one.");
@@ -225,18 +225,33 @@ public class Main {
                                         }
                                     case 2:
                                         //add a doctor
-                                            /*
-                                            System.out.println("Insert the username");
-                                            String DoctorUsername = keyboard.next();
-                                            System.out.println("Insert the password");
-                                            String DoctorPassword = keyboard.next();
-                                            Doctor DoctorAdd= new Doctor(DoctorUsername, Doctorpassword, name, city, specialization, bio, address);
-                                            if (!mdb.add_doctor_by_administrator(DoctorAdd)) {
-                                                System.out.println("The username is already used. Please choose another one.");
-                                            } else {
-                                                System.out.println("add successful!");
-                                                break;
-                                            }*/
+
+                                        System.out.println("Insert the username");
+                                        String usernameD = keyboard.next();
+                                        System.out.println("Insert the password");
+                                        String passwordD = keyboard.next();
+                                        System.out.println("Insert the name");
+                                        String name = keyboard.next();
+                                        System.out.println("Insert the city");
+                                        String city = keyboard.next();
+                                        System.out.println("Insert a short bio");
+                                        String bio = keyboard.next();
+                                        System.out.println("Insert the specialization");
+                                        String specialization = keyboard.next();
+                                        System.out.println("Insert the address");
+                                        String address = keyboard.next();
+                                        System.out.println("Insert the price for the visit");
+                                        int price = keyboard.nextInt();
+
+                                        Doctor doctor = new Doctor(usernameD, passwordD, price, city, bio, specialization, bio, address);
+
+                                        if (!mdb.add_doctor(doctor)) {
+                                            System.out.println("The username is already used. Please choose another one.");
+                                        } else {
+                                            System.out.println("add successful!");
+                                            break;
+                                        }
+
                                     case 3:
                                         //add a user
                                         while (true)
@@ -260,15 +275,163 @@ public class Main {
                                         }
                                     case 4:
                                         //delete a doctor
-                                        System.out.println("ok 4");
+                                        System.out.println("Insert the username you want to delete");
+                                        String usernameDeleteDoc = keyboard.next();
+                                        String passwordDeleteDoc = "ok";
+
+                                        Doctor doctorDelete = new Doctor(usernameDeleteDoc, passwordDeleteDoc);
+                                        if (!mdb.delete_doctor_by_the_administrator(doctorDelete)) {
+                                            System.out.println(" username not found. Please choose another one.");
+                                        } else {
+                                            System.out.println("username deleted successful!");
+                                            break;
+                                        }
                                         break;
                                     case 5:
                                         //update a doctor
-                                        System.out.println("ok 5");
-                                        break;
+
+
+                                        System.out.println("what do you want to modify?");
+                                        System.out.println("--ADMINISTRATOR--\nSelect a command: " +
+                                                "\n1. username" +
+                                                "\n2. password" +
+                                                "\n3. city" +
+                                                "\n4. specialization" +
+                                                "\n5. bio" +
+                                                "\n6. address" +
+                                                "\n7. name" +
+                                                "\n8. price"+
+                                                "\n\n0. Go back");
+                                        try{
+                                            int option_administrator_modify_doctor = keyboard.nextInt();
+
+                                            switch (option_administrator_modify_doctor)
+                                            {
+                                                case 1:
+                                                    //modify username doctor
+                                                    System.out.println("Insert the username you want modify");
+                                                    String usernameModify = keyboard.next();
+                                                    System.out.println("Insert the new username");
+                                                    String passwordNModify = keyboard.next();
+                                                    int price1 = 1;
+                                                    Doctor doctorUsername = new Doctor(usernameModify, passwordNModify,price1);
+                                                    if (!mdb.update_doctor_by_the_administrator(doctorUsername)) {
+                                                        System.out.println(" username not found. Please choose another one.");
+                                                    } else {
+                                                        System.out.println("username updated successful!");
+                                                        break;
+                                                    }
+                                                case 2:
+                                                    //modify password doctor
+                                                    System.out.println("Insert the username you want modify");
+                                                    String usernameUpdate = keyboard.next();
+                                                    System.out.println("Insert the new password");
+                                                    String passwordUpdate = keyboard.next();
+                                                    int price2 = 2;
+                                                    Doctor doctorPassword = new Doctor(usernameUpdate, passwordUpdate, price2);
+                                                    if (!mdb.update_doctor_by_the_administrator(doctorPassword)) {
+                                                        System.out.println(" username not found. Please choose another one.");
+                                                    } else {
+                                                        System.out.println("password updated successful!");
+                                                        break;
+                                                    }
+                                                case 3:
+                                                    //modify city doctor
+                                                    System.out.println("Insert the username you want modify");
+                                                    String usernameUpCity = keyboard.next();
+                                                    System.out.println("Insert the new city");
+                                                    String passwordUpCity = keyboard.next();
+                                                    int price3 = 3;
+                                                    Doctor doctorCity = new Doctor(usernameUpCity, passwordUpCity, price3);
+                                                    if (!mdb.update_doctor_by_the_administrator(doctorCity)) {
+                                                        System.out.println(" username not found. Please choose another one.");
+                                                    } else {
+                                                        System.out.println("city updated successful!");
+                                                        break;
+                                                    }
+
+                                                case 4:
+                                                    //modify specialization doctor
+                                                    System.out.println("Insert the username you want modify");
+                                                    String usernameUpS = keyboard.next();
+                                                    System.out.println("Insert the new specialization");
+                                                    String passwordUpS = keyboard.next();
+                                                    int price4 = 4;
+                                                    Doctor doctorS = new Doctor(usernameUpS, passwordUpS, price4);
+                                                    if (!mdb.update_doctor_by_the_administrator(doctorS)) {
+                                                        System.out.println(" username not found. Please choose another one.");
+                                                    } else {
+                                                        System.out.println("specialization updated successful!");
+                                                        break;
+                                                    }
+                                                case 5:
+                                                    //modify bio doctor
+                                                    System.out.println("Insert the username you want modify");
+                                                    String usernameUpB = keyboard.next();
+                                                    System.out.println("Insert the new bio");
+                                                    String passwordUpB = keyboard.next();
+                                                    int price5 = 5;
+                                                    Doctor doctorB = new Doctor(usernameUpB, passwordUpB, price5);
+                                                    if (!mdb.update_doctor_by_the_administrator(doctorB)) {
+                                                        System.out.println(" username not found. Please choose another one.");
+                                                    } else {
+                                                        System.out.println("bio updated successful!");
+                                                        break;
+                                                    }
+                                                case 6:
+                                                    //modify address doctor
+                                                    System.out.println("Insert the username you want modify");
+                                                    String usernameUpA = keyboard.next();
+                                                    System.out.println("Insert the new address");
+                                                    String passwordUpA = keyboard.next();
+                                                    int price6 = 6;
+                                                    Doctor doctorA = new Doctor(usernameUpA, passwordUpA, price6);
+                                                    if (!mdb.update_doctor_by_the_administrator(doctorA)) {
+                                                        System.out.println(" username not found. Please choose another one.");
+                                                    } else {
+                                                        System.out.println("address updated successful!");
+                                                        break;
+                                                    }
+                                                case 7:
+                                                    //modify name doctor
+                                                    System.out.println("Insert the username you want modify");
+                                                    String usernameUpN = keyboard.next();
+                                                    System.out.println("Insert the new name");
+                                                    String passwordUpN = keyboard.next();
+                                                    int price7 = 7;
+                                                    Doctor doctorN = new Doctor(usernameUpN, passwordUpN, price7);
+                                                    if (!mdb.update_doctor_by_the_administrator(doctorN)) {
+                                                        System.out.println(" username not found. Please choose another one.");
+                                                    } else {
+                                                        System.out.println("name updated successful!");
+                                                        break;
+                                                    }
+                                                break;
+                                                case 8:
+                                                    //modify price doctor
+                                                    System.out.println("Insert the username you want modify");
+                                                    String usernameUpPrice = keyboard.next();
+                                                    String passwordUpPrice = "password";
+                                                    int price8 = 8;
+                                                    Doctor DoctorPrice = new Doctor(usernameUpPrice, passwordUpPrice, price8);
+                                                    if (!mdb.update_doctor_by_the_administrator(DoctorPrice)) {
+                                                        System.out.println(" username not found. Please choose another one.");
+                                                    } else {
+                                                        System.out.println("price updated successful!");
+                                                        break;
+                                                    }
+                                                break;
+                                                    case 0:
+                                                    //go back
+
+                                                    break;
+                                            }
+                                        }catch (Exception e){
+                                            System.out.println("ERROR--------");
+                                            continue;}
                                     case 6:
                                         //delete a user
-                                        System.out.println("Insert the username you want delete");
+                                        System.out.println("Insert the username you want to delete");
                                         String usernameDelete = keyboard.next();
                                         String passwordDelete = "ok";
                                         int age4 = 1;

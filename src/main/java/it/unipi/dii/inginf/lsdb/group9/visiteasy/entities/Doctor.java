@@ -13,26 +13,25 @@ public class Doctor {
 
 
     //COSTRUTTORI
-
-    public Doctor (String username, String password){
-        this.username=username;
-        this.password=password;
-    }
-
-    public Doctor(String username, String password, String name, String city, String specialization, String bio, String address) {
+    public Doctor(String username, String password) {
         this.username = username;
         this.password = password;
+    }
+
+    public Doctor(String username, String password, int price) {
+        this(username, password);
+        this.price = price;
+    }
+    public Doctor(String username, String password,int price, String name, String city, String specialization, String bio, String address) {
+        this(username, password,price);
         this.bio = bio;
         this.city = city;
         this.name = name;
         this.specialization = specialization;
         this.address = address;
+
     }
 
-    public Doctor(String username, String password, String name, String city, String specialization, String bio, String address, int price) {
-        this(username, password, name, city, specialization, bio, address);
-        this.price = price;
-    }
 
 
 
