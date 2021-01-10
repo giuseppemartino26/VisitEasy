@@ -43,6 +43,15 @@ public class MongoManager {
         } else return false;
     }
 
+    boolean add_doctor(Doctor doctor)
+    {
+        if (users.countDocuments(new Document("username", doctor.getUsername())) == 0) {
+            Document doc = new Document("username", doctor.getUsername()).append("password", doctor.getPassword()).append("name", doctor.getName()).append("city", doctor.getCity()).append("bio", doctor.getBio()).append("specialization", doctor.getSpecialization()).append("address", doctor.getAddress()).append("price", doctor.getPrice());
+            users.insertOne(doc);
+            return true;
+        } else return false;
+    }
+
 
     boolean login_user(User user)
     {
@@ -58,6 +67,28 @@ public class MongoManager {
         if (psw.equals(user.getPassword())) {
             int age = result.getInteger("age");
             user.setAge(age);
+            System.out.println("Correct credentials");
+            return true;
+        } else{
+            System.out.println("Incorrect password");
+            return false;
+        }
+
+    }
+
+
+    boolean login_doctor(Doctor doctor)
+    {
+        Document result = users.find(eq("username", doctor.getUsername())).first();
+        try {
+            result.getString("username");
+        }catch (NullPointerException exception){
+            System.out.println("The username does not exist");
+            return false;
+        }
+
+        String psw = result.getString("password");
+        if (psw.equals(doctor.getPassword())) {
             System.out.println("Correct credentials");
             return true;
         } else{

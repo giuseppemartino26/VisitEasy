@@ -28,7 +28,79 @@ public class Main {
                 {
                     case 1:
 
-                        break;
+                        System.out.println("--DOCTOR--\nSelect a command: " +
+                                "\n1. Login" +
+                                "\n2. Sign up" +
+                                "\n\n0. Go back");
+
+                        try{
+                            int option_doctor = keyboard.nextInt();
+
+                            switch (option_doctor)
+                            {
+                                case 1: //LOGIN
+
+                                    while (true)
+                                    {
+                                        System.out.println("--LOGIN DOCTOR--\nInsert the username");
+                                        String username = keyboard.next();
+                                        System.out.println("Insert the password");
+                                        String password = keyboard.next();
+
+                                        Doctor doctor = new Doctor(username,password);
+                                        if (!mdb.login_doctor(doctor)){
+                                            System.out.println("Please retry");
+                                        }else {
+                                            //TODO
+                                        }
+
+                                    }
+
+                                case 2: //SignUp
+                                    while (true)
+                                    {
+
+                                        System.out.println("Insert the username");
+                                        String username = keyboard.next();
+                                        System.out.println("Insert the password");
+                                        String password = keyboard.next();
+                                        System.out.println("Insert your name");
+                                        String name = keyboard.next();
+                                        System.out.println("Insert your city");
+                                        String city = keyboard.next();
+                                        System.out.println("Insert a short bio");
+                                        String bio = keyboard.next();
+                                        System.out.println("Insert your specialization");
+                                        String specialization = keyboard.next();
+                                        System.out.println("Insert your address");
+                                        String address = keyboard.next();
+                                        System.out.println("Insert price for your visit");
+                                        int price = keyboard.nextInt();
+
+                                        Doctor doctor = new Doctor(username, password, name, city, bio, specialization, address, price);
+
+                                        if (!mdb.add_doctor(doctor)) {
+                                            System.out.println("The username is already used. Please choose another one.");
+                                        } else {
+                                            System.out.println("Registration successful!");
+                                            break;
+                                        }
+                                    }
+
+
+                                case 0:
+                                    continue; //torna indietro alla pagina principale
+
+                                default:
+                                    System.out.println("insert a correct number");
+                                    continue;
+                            }
+                        }catch (Exception e){
+                            System.out.println("ERROR: insert a correct number.");
+                            continue;
+                        }
+
+
 
 
                     case 2:
