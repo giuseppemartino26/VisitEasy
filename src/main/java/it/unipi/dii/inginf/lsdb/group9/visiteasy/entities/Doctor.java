@@ -33,11 +33,13 @@ public class Doctor {
         this.price = price;
     }
 
-    public Doctor(String name, String address,String bio)
+    public Doctor(String name, int price, String address, String bio)
     {
         this.name = name;
+        this.price = price;
         this.address = address;
         this.bio = bio;
+
     }
 
 

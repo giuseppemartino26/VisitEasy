@@ -3,6 +3,8 @@ package it.unipi.dii.inginf.lsdb.group9.visiteasy;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Administrator;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Doctor;
+import java.io.*;
+
 import  java.util.*;
 
 
@@ -12,6 +14,7 @@ public class Main {
 
    private static MongoManager mdb = new MongoManager();
    private static Scanner keyboard = new Scanner(System.in);
+
 
 /**/
 
@@ -41,7 +44,11 @@ public class Main {
         }
     }
 
-
+    public static void printDocInfo(String name)
+    {
+        Doctor doctor = mdb.getDocInfo(name);
+        System.out.println(doctor.getName()+"\nAddress: "+doctor.getAddress()+"\nprice : "+doctor.getPrice()+"€"+"\nBiography: "+doctor.getBio());
+    }
 
 
     public static void main(String[] args) {
@@ -60,8 +67,8 @@ public class Main {
 
                 switch (option)
                 {
-                    case 9:
-                        mdb.cheapestDoc("Milano","Dentist");
+                    case 9: //SOLO PER PROVARE LE FUNZIONI VELOCEMENTE
+
                     case 1:
 
                         System.out.println("--DOCTOR--\nSelect a command: " +
@@ -199,7 +206,18 @@ public class Main {
 
                                             }
                                             System.out.println("Enter the name of the doctor you want to see:");
-                                            String namedoc = keyboard.next();
+
+                                            InputStreamReader input = new InputStreamReader(System.in);
+                                            BufferedReader tastiera = new BufferedReader(input);
+
+                                            String nome = null;
+                                            try {
+                                                nome=tastiera.readLine();
+                                            }catch (Exception e){ }
+
+                                            printDocInfo(nome);
+                                            
+                                            int bo = keyboard.nextInt();
 
 
 

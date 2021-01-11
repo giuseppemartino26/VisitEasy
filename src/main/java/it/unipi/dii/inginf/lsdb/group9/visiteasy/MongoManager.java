@@ -167,7 +167,7 @@ boolean add_administrator(Administrator administrator) {
         doctors.find(and(eq("city", city), eq("specialization", specialization))).forEach(addtolist);
         return doclist;
     }
-    
+
 
     ArrayList<Doctor> cheapestDoc(String city, String specialization)
     {
@@ -184,7 +184,13 @@ boolean add_administrator(Administrator administrator) {
 
         doctors.aggregate(Arrays.asList(myMatch,mySort,myLimit)).forEach(addtolist);
         return doclist;
+    }
 
+    Doctor getDocInfo(String name)
+    {
+        Document result = doctors.find(eq("name", name)).first();
+        Doctor doctor = new Doctor(result.getString("name"),result.getInteger("price"),result.getString("address"),result.getString("bio"));
+        return  doctor;
     }
 
 
