@@ -13,6 +13,11 @@ public class Doctor {
 
 
     //COSTRUTTORI
+
+    public Doctor(String name) {
+        this.name = name;
+    }
+
     public Doctor(String username, String password) {
         this.username = username;
         this.password = password;
@@ -22,6 +27,15 @@ public class Doctor {
         this(username, password);
         this.price = price;
     }
+
+    public Doctor(String name, String address,String bio)
+    {
+        this.name = name;
+        this.address = address;
+        this.bio = bio;
+    }
+
+
     public Doctor(String username, String password,int price, String name, String city, String specialization, String bio, String address) {
         this(username, password,price);
         this.bio = bio;

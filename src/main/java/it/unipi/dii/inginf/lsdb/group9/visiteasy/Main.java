@@ -6,12 +6,31 @@ import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Doctor;
 import  java.util.*;
 
 
+
+
 public class Main {
+
+   private static MongoManager mdb = new MongoManager();
+   private static Scanner keyboard = new Scanner(System.in);
+
+
+
+    public static void printAllDocList(String city, String spec)
+    {
+        ArrayList<Doctor> doclist = new ArrayList<>();
+        doclist = mdb.getDocByCitySpec(city, spec);
+
+        System.out.println("----List of all "+spec+" of "+city+"----");
+
+        for (int i = 0; i < doclist.size(); i++)
+        {
+            System.out.println(doclist.get(i).getName());
+        }
+    }
+
 
     public static void main(String[] args) {
 
-        MongoManager mdb = new MongoManager();
-        Scanner keyboard = new Scanner(System.in);
 
         while (true)
         {
@@ -26,6 +45,7 @@ public class Main {
 
                 switch (option)
                 {
+
                     case 1:
 
                         System.out.println("--DOCTOR--\nSelect a command: " +
@@ -140,6 +160,27 @@ public class Main {
                                             System.out.println("Insert the specialization");
                                             String specialization = keyboard.next();
 
+                                            System.out.println("Choose the doctors by: (select a command)" +
+                                                    "\n1. Show the entire list" +
+                                                    "\n2. Sort by ascendent price (most 3 cheapest doctors)" +
+                                                    "\n3. Doctors most reviewed" +
+                                                    "\n4. Doctors recommended by the system");
+
+                                            int sort = keyboard.nextInt();
+
+                                            switch (sort)
+                                            {
+                                                case 1:
+                                                    printAllDocList(city,specialization);
+                                                    break;
+
+
+                                            }
+                                            System.out.println("Enter the name of the doctor you want to see:");
+                                            String namedoc = keyboard.next();
+
+
+
                                             //TODO
                                         }
 
@@ -199,10 +240,8 @@ public class Main {
                                         "\n2. add a doctor" +
                                         "\n3. add a user" +
                                         "\n4. delete a doctor" +
-                                        "\n5. update a doctor" +
-                                        "\n6. delete a user" +
-                                        "\n7. update a user" +
-                                        "\n8. populate db" +
+                                        "\n5. delete a user" +
+                                        "\n6. populate db" +
                                         "\n\n0. Go back");
                             }
                             try{
@@ -287,149 +326,8 @@ public class Main {
                                             break;
                                         }
                                         break;
+
                                     case 5:
-                                        //update a doctor
-
-
-                                        System.out.println("what do you want to modify?");
-                                        System.out.println("--ADMINISTRATOR--\nSelect a command: " +
-                                                "\n1. username" +
-                                                "\n2. password" +
-                                                "\n3. city" +
-                                                "\n4. specialization" +
-                                                "\n5. bio" +
-                                                "\n6. address" +
-                                                "\n7. name" +
-                                                "\n8. price"+
-                                                "\n\n0. Go back");
-                                        try{
-                                            int option_administrator_modify_doctor = keyboard.nextInt();
-
-                                            switch (option_administrator_modify_doctor)
-                                            {
-                                                case 1:
-                                                    //modify username doctor
-                                                    System.out.println("Insert the username you want modify");
-                                                    String usernameModify = keyboard.next();
-                                                    System.out.println("Insert the new username");
-                                                    String passwordNModify = keyboard.next();
-                                                    int price1 = 1;
-                                                    Doctor doctorUsername = new Doctor(usernameModify, passwordNModify,price1);
-                                                    if (!mdb.update_doctor_by_the_administrator(doctorUsername)) {
-                                                        System.out.println(" username not found. Please choose another one.");
-                                                    } else {
-                                                        System.out.println("username updated successful!");
-                                                        break;
-                                                    }
-                                                case 2:
-                                                    //modify password doctor
-                                                    System.out.println("Insert the username you want modify");
-                                                    String usernameUpdate = keyboard.next();
-                                                    System.out.println("Insert the new password");
-                                                    String passwordUpdate = keyboard.next();
-                                                    int price2 = 2;
-                                                    Doctor doctorPassword = new Doctor(usernameUpdate, passwordUpdate, price2);
-                                                    if (!mdb.update_doctor_by_the_administrator(doctorPassword)) {
-                                                        System.out.println(" username not found. Please choose another one.");
-                                                    } else {
-                                                        System.out.println("password updated successful!");
-                                                        break;
-                                                    }
-                                                case 3:
-                                                    //modify city doctor
-                                                    System.out.println("Insert the username you want modify");
-                                                    String usernameUpCity = keyboard.next();
-                                                    System.out.println("Insert the new city");
-                                                    String passwordUpCity = keyboard.next();
-                                                    int price3 = 3;
-                                                    Doctor doctorCity = new Doctor(usernameUpCity, passwordUpCity, price3);
-                                                    if (!mdb.update_doctor_by_the_administrator(doctorCity)) {
-                                                        System.out.println(" username not found. Please choose another one.");
-                                                    } else {
-                                                        System.out.println("city updated successful!");
-                                                        break;
-                                                    }
-
-                                                case 4:
-                                                    //modify specialization doctor
-                                                    System.out.println("Insert the username you want modify");
-                                                    String usernameUpS = keyboard.next();
-                                                    System.out.println("Insert the new specialization");
-                                                    String passwordUpS = keyboard.next();
-                                                    int price4 = 4;
-                                                    Doctor doctorS = new Doctor(usernameUpS, passwordUpS, price4);
-                                                    if (!mdb.update_doctor_by_the_administrator(doctorS)) {
-                                                        System.out.println(" username not found. Please choose another one.");
-                                                    } else {
-                                                        System.out.println("specialization updated successful!");
-                                                        break;
-                                                    }
-                                                case 5:
-                                                    //modify bio doctor
-                                                    System.out.println("Insert the username you want modify");
-                                                    String usernameUpB = keyboard.next();
-                                                    System.out.println("Insert the new bio");
-                                                    String passwordUpB = keyboard.next();
-                                                    int price5 = 5;
-                                                    Doctor doctorB = new Doctor(usernameUpB, passwordUpB, price5);
-                                                    if (!mdb.update_doctor_by_the_administrator(doctorB)) {
-                                                        System.out.println(" username not found. Please choose another one.");
-                                                    } else {
-                                                        System.out.println("bio updated successful!");
-                                                        break;
-                                                    }
-                                                case 6:
-                                                    //modify address doctor
-                                                    System.out.println("Insert the username you want modify");
-                                                    String usernameUpA = keyboard.next();
-                                                    System.out.println("Insert the new address");
-                                                    String passwordUpA = keyboard.next();
-                                                    int price6 = 6;
-                                                    Doctor doctorA = new Doctor(usernameUpA, passwordUpA, price6);
-                                                    if (!mdb.update_doctor_by_the_administrator(doctorA)) {
-                                                        System.out.println(" username not found. Please choose another one.");
-                                                    } else {
-                                                        System.out.println("address updated successful!");
-                                                        break;
-                                                    }
-                                                case 7:
-                                                    //modify name doctor
-                                                    System.out.println("Insert the username you want modify");
-                                                    String usernameUpN = keyboard.next();
-                                                    System.out.println("Insert the new name");
-                                                    String passwordUpN = keyboard.next();
-                                                    int price7 = 7;
-                                                    Doctor doctorN = new Doctor(usernameUpN, passwordUpN, price7);
-                                                    if (!mdb.update_doctor_by_the_administrator(doctorN)) {
-                                                        System.out.println(" username not found. Please choose another one.");
-                                                    } else {
-                                                        System.out.println("name updated successful!");
-                                                        break;
-                                                    }
-                                                break;
-                                                case 8:
-                                                    //modify price doctor
-                                                    System.out.println("Insert the username you want modify");
-                                                    String usernameUpPrice = keyboard.next();
-                                                    String passwordUpPrice = "password";
-                                                    int price8 = 8;
-                                                    Doctor DoctorPrice = new Doctor(usernameUpPrice, passwordUpPrice, price8);
-                                                    if (!mdb.update_doctor_by_the_administrator(DoctorPrice)) {
-                                                        System.out.println(" username not found. Please choose another one.");
-                                                    } else {
-                                                        System.out.println("price updated successful!");
-                                                        break;
-                                                    }
-                                                break;
-                                                    case 0:
-                                                    //go back
-
-                                                    break;
-                                            }
-                                        }catch (Exception e){
-                                            System.out.println("ERROR--------");
-                                            continue;}
-                                    case 6:
                                         //delete a user
                                         System.out.println("Insert the username you want to delete");
                                         String usernameDelete = keyboard.next();
@@ -443,69 +341,7 @@ public class Main {
                                             break;
                                         }
                                         break;
-                                    case 7:
-                                        //update a user
 
-                                        System.out.println("what do you want to modify?");
-                                        System.out.println("--ADMINISTRATOR--\nSelect a command: " +
-                                                "\n1. username" +
-                                                "\n2. password" +
-                                                "\n3. age"+
-                                                "\n\n0. Go back");
-                                        try{
-                                            int option_administrator_modify_user = keyboard.nextInt();
-
-                                            switch (option_administrator_modify_user)
-                                            {
-                                                case 1:
-                                                    //modify username user
-                                                    System.out.println("Insert the username you want modify");
-                                                    String usernameModify = keyboard.next();
-                                                    System.out.println("Insert the new username");
-                                                    String passwordNModify = keyboard.next();
-                                                    int age1 = 1;
-                                                    User userUsername = new User(usernameModify, passwordNModify, age1);
-                                                    if (!mdb.update_user_by_the_administrator(userUsername)) {
-                                                        System.out.println(" username not found. Please choose another one.");
-                                                    } else {
-                                                        System.out.println("username updated successful!");
-                                                        break;
-                                                    }
-                                                case 2:
-                                                    //modify password user
-                                                    System.out.println("Insert the username you want modify");
-                                                    String usernameUpdate = keyboard.next();
-                                                    System.out.println("Insert the new password");
-                                                    String passwordUpdate = keyboard.next();
-                                                    int age2 = 2;
-                                                    User userPassword = new User(usernameUpdate, passwordUpdate, age2);
-                                                    if (!mdb.update_user_by_the_administrator(userPassword)) {
-                                                        System.out.println(" username not found. Please choose another one.");
-                                                    } else {
-                                                        System.out.println("password updated successful!");
-                                                        break;
-                                                    }
-                                                case 3:
-                                                    //modify age user
-                                                    System.out.println("Insert the username you want modify");
-                                                    String usernameUpAge = keyboard.next();
-                                                    String passwordUpAge = "password";
-                                                    int age3 = 3;
-                                                    User userAge = new User(usernameUpAge, passwordUpAge, age3);
-                                                    if (!mdb.update_user_by_the_administrator(userAge)) {
-                                                        System.out.println(" username not found. Please choose another one.");
-                                                    } else {
-                                                        System.out.println("age updated successful!");
-                                                        break;
-                                                    }
-                                                case 0:
-                                                    //go back
-
-                                                    break;
-                                            }
-                                        }catch (Exception e){
-                                            System.out.println("ERROR--------");
-                                            continue;}
 
                                     case 8:
                                         //populate db
@@ -520,7 +356,6 @@ public class Main {
                                 }
                             }catch (Exception e){
                                 System.out.println("ERROR: insert a correct number.");
-                                continue;
                             }
                             //break;
 
@@ -529,11 +364,9 @@ public class Main {
 
                     default:
                         System.out.println("Please, insert a number from 1 to 3");
-                        continue;
                 }
             }catch (Exception e){
                 System.out.println("ERROR: insert a number from 1 to 3.");
-                continue;
             }
 
 

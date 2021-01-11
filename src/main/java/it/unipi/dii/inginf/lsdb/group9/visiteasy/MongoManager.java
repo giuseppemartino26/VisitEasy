@@ -3,6 +3,7 @@ package it.unipi.dii.inginf.lsdb.group9.visiteasy;
 import com.mongodb.client.*;
 
 import  java.util.*;
+import java.lang.*;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Updates;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Administrator;
@@ -16,7 +17,7 @@ import org.joda.time.format.DateTimeFormat;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
-import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.set;
 
 
@@ -30,6 +31,8 @@ public class MongoManager {
 
     Consumer<Document> printDocuments = document -> {System.out.println(document.toJson());};
     Consumer<Document> printvalue = document -> {System.out.println(document.getString("_id"));};
+    Consumer<Document> printnamedoc = document -> {System.out.println(document.getString("name"));};
+
 
     Scanner keyboard = new Scanner(System.in);
 
@@ -58,10 +61,10 @@ public class MongoManager {
         Document result = users.find(eq("username", user.getUsername())).first(); //salvo in "result" il documento il cui campo username è uguale a quello passato come parametro
         try {
             result.getString("username");
-       }catch (NullPointerException exception){
-           System.out.println("The username does not exist");
-           return false;
-       }
+        }catch (NullPointerException exception){
+            System.out.println("The username does not exist");
+            return false;
+        }
 
         String psw = result.getString("password");
         if (psw.equals(user.getPassword())) {
@@ -143,134 +146,20 @@ boolean add_administrator(Administrator administrator) {
     }
 
 
+    ArrayList<Doctor> getDocByCitySpec(String city, String specialization)
+    {
+        ArrayList<Doctor> doclist = new ArrayList<>();
 
-    //UPDATE USER BY THE ADMINISTRATOR
-    boolean update_user_by_the_administrator(User user) {
+        Consumer<Document> addtolist = document -> {
+            Doctor newdoc = new Doctor(document.getString("name"));
+            doclist.add(newdoc);
+        };
 
-        Document result = users.find(eq("username", user.getUsername())).first();
-        try {
-            result.getString("username");
-        } catch (NullPointerException exception) {
-            System.out.println("The username does not exist");
-            return false;}
-        //tramite parametro age, decido se devo moficare password, username o age o aggiungere il campo
-
-        if(user.getAge()==1){
-            try {
-                //ho passato come parametro il nuovo username nel campo password
-                users.updateOne(eq("username", user.getUsername()), (Bson) set("username",user.getPassword() ));
-            }catch (NullPointerException ex) {
-                System.out.println("The username does not exist");
-                return false;
-        }
-        }else if (user.getAge()==2){
-            try {
-                //ho passato come parametro il la nuova password nel campo password
-                users.updateOne(eq("username", user.getUsername()), (Bson) set("password",user.getPassword() ));
-            }catch (NullPointerException ex) {
-                System.out.println("The username does not exist");
-                return false;
-            }
-
-
-        }else {
-            try {
-                //chiedo la nuova età
-                System.out.println("Insert new age");
-                int age = keyboard.nextInt();
-                users.updateOne(eq("username", user.getUsername()), (Bson) set("age",age ));
-            }catch (NullPointerException ex) {
-                System.out.println("The username does not exist");
-                return false;
-            }
-
-        }
-        return true;
+        doctors.find(and(eq("city", city), eq("specialization", specialization))).forEach(addtolist);
+        return doclist;
     }
-    //UPDATE USER BY THE ADMINISTRATOR
-    boolean update_doctor_by_the_administrator(Doctor doctor) {
-
-        Document result = users.find(eq("username", doctor.getUsername())).first();
-        try {
-            result.getString("username");
-        } catch (NullPointerException exception) {
-            System.out.println("The username does not exist");
-            return false;}
-        //tramite parametro age, decido se devo moficare password, username o age o aggiungere il campo
-
-        if(doctor.getPrice()==1){
-            try {
-                //ho passato come parametro il nuovo username nel campo password
-                doctors.updateOne(eq("username", doctor.getUsername()), (Bson) set("username",doctor.getPassword() ));
-            }catch (NullPointerException ex) {
-                System.out.println("The username does not exist");
-                return false;
-            }
-        }else if (doctor.getPrice()==2){
-            try {
-                //ho passato come parametro  la nuova password nel campo password
-                doctors.updateOne(eq("username", doctor.getUsername()), (Bson) set("password",doctor.getPassword() ));
-            }catch (NullPointerException ex) {
-                System.out.println("The username does not exist");
-                return false;
-            }
 
 
-        }
-            else if(doctor.getPrice()==3) {
-            try {
-                //ho passato come parametro la nuova city nel campo password
-                doctors.updateOne(eq("username", doctor.getUsername()), (Bson) set("city", doctor.getPassword()));
-            } catch (NullPointerException ex) {
-                System.out.println("The username does not exist");
-                return false;
-            }
-        }else if(doctor.getPrice()==4) {
-                try {
-                    //ho passato come parametro la nuova specialization nel campo password
-                    doctors.updateOne(eq("username", doctor.getUsername()), (Bson) set("specialization", doctor.getPassword()));
-                } catch (NullPointerException ex) {
-                    System.out.println("The username does not exist");
-                    return false;
-                }
-            }else if(doctor.getPrice()==5) {
-            try {
-                //ho passato come parametro la nuova bio nel campo password
-                doctors.updateOne(eq("username", doctor.getUsername()), (Bson) set("bio", doctor.getPassword()));
-            } catch (NullPointerException ex) {
-                System.out.println("The username does not exist");
-                return false;
-            }
-        }else if(doctor.getPrice()==6) {
-            try {
-                //ho passato come parametro il nuovo address nel campo password
-                doctors.updateOne(eq("username", doctor.getUsername()), (Bson) set("address", doctor.getPassword()));
-            } catch (NullPointerException ex) {
-                System.out.println("The username does not exist");
-                return false;
-            }
-        }else if(doctor.getPrice()==7) {
-            try {
-                //ho passato come parametro il nuovo name nel campo password
-                doctors.updateOne(eq("username", doctor.getUsername()), (Bson) set("name", doctor.getPassword()));
-            } catch (NullPointerException ex) {
-                System.out.println("The username does not exist");
-                return false;
-            }
-        }else {
-                        try {
-                            //chiedo il nuovo price
-                            System.out.println("Insert new price");
-                            int price = keyboard.nextInt();
-                            doctors.updateOne(eq("username", doctor.getUsername()), (Bson) set("price",price ));
-                        }catch (NullPointerException ex) {
-                            System.out.println("The username does not exist");
-                            return false;
-
-        }
-        return true;
-    }
-    return true;}
 //DELETE USER
     boolean delete_user_by_the_administrator(User user)
     {
