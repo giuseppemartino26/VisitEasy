@@ -18,7 +18,16 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 
 import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Sorts.ascending;
 import static com.mongodb.client.model.Updates.set;
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Updates.*;
+import static com.mongodb.client.model.Aggregates.*;
+import static com.mongodb.client.model.Projections.*;
+import static com.mongodb.client.model.Accumulators.*;
+import static com.mongodb.client.model.Accumulators.addToSet;
+import static com.mongodb.client.model.Accumulators.sum;
+import static com.mongodb.client.model.Sorts.descending;
 
 
 public class MongoManager {
@@ -157,6 +166,25 @@ boolean add_administrator(Administrator administrator) {
 
         doctors.find(and(eq("city", city), eq("specialization", specialization))).forEach(addtolist);
         return doclist;
+    }
+    
+
+    ArrayList<Doctor> cheapestDoc(String city, String specialization)
+    {
+        ArrayList<Doctor> doclist = new ArrayList<>();
+
+        Consumer<Document> addtolist = document -> {
+            Doctor newdoc = new Doctor(document.getString("name"),document.getInteger("price"));
+            doclist.add(newdoc);
+        };
+
+        Bson myMatch = match(and(eq("city",city), eq("specialization", specialization), gte("price", 1)));
+        Bson mySort = sort(ascending("price"));
+        Bson myLimit = limit(3);
+
+        doctors.aggregate(Arrays.asList(myMatch,mySort,myLimit)).forEach(addtolist);
+        return doclist;
+
     }
 
 

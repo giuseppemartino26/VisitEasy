@@ -13,7 +13,7 @@ public class Main {
    private static MongoManager mdb = new MongoManager();
    private static Scanner keyboard = new Scanner(System.in);
 
-
+/**/
 
     public static void printAllDocList(String city, String spec)
     {
@@ -27,6 +27,21 @@ public class Main {
             System.out.println(doclist.get(i).getName());
         }
     }
+
+    public static void printCheapestDocList(String city, String spec)
+    {
+        ArrayList<Doctor> doclist = new ArrayList<>();
+        doclist = mdb.cheapestDoc(city,spec);
+
+        System.out.println("----List of top 3 cheapest "+spec+" of "+city+"----");
+
+        for (int i = 0; i < doclist.size(); i++)
+        {
+            System.out.println(doclist.get(i).getName()+"   Price of the medical examination: "+doclist.get(i).getPrice()+"€");
+        }
+    }
+
+
 
 
     public static void main(String[] args) {
@@ -45,7 +60,8 @@ public class Main {
 
                 switch (option)
                 {
-
+                    case 9:
+                        mdb.cheapestDoc("Milano","Dentist");
                     case 1:
 
                         System.out.println("--DOCTOR--\nSelect a command: " +
@@ -174,6 +190,12 @@ public class Main {
                                                     printAllDocList(city,specialization);
                                                     break;
 
+                                                case 2:
+                                                    printCheapestDocList(city,specialization);
+                                                    break;
+
+                                                //TODO Inserire quelli con Cypher
+
 
                                             }
                                             System.out.println("Enter the name of the doctor you want to see:");
@@ -181,7 +203,7 @@ public class Main {
 
 
 
-                                            //TODO
+
                                         }
 
                                     }

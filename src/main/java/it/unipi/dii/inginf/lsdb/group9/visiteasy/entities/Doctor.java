@@ -18,6 +18,11 @@ public class Doctor {
         this.name = name;
     }
 
+    public Doctor(String name, int price){
+        this(name);
+        this.price = price;
+    }
+
     public Doctor(String username, String password) {
         this.username = username;
         this.password = password;
