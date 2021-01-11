@@ -35,12 +35,13 @@ public class MongoManager {
     MongoClient mongoClient = MongoClients.create();
     MongoDatabase db = mongoClient.getDatabase("progetto");
     MongoCollection<Document> users = db.getCollection("users");
-    MongoCollection<Document> doctors = db.getCollection("doctors");
+    MongoCollection<Document> doctors = db.getCollection("doctors2");
     MongoCollection<Document> administrators = db.getCollection("administrator");
 
     Consumer<Document> printDocuments = document -> {System.out.println(document.toJson());};
     Consumer<Document> printvalue = document -> {System.out.println(document.getString("_id"));};
     Consumer<Document> printnamedoc = document -> {System.out.println(document.getString("name"));};
+    Consumer<Document> printcale = document -> {System.out.println(document.getString("calendario"));};
 
 
     Scanner keyboard = new Scanner(System.in);
@@ -63,6 +64,8 @@ public class MongoManager {
             return true;
         } else return false;
     }
+
+
 
 
     boolean login_user(User user)
@@ -255,6 +258,53 @@ boolean add_administrator(Administrator administrator) {
         Document updateQuery = new Document();
         updateQuery.put("calendario.$."+newhour,"");
         doctors.updateOne(query,new Document("$set",updateQuery));
+    }
+
+    boolean libero(String namedoc,String date, String hour)
+    {
+        long count = doctors.countDocuments(new Document("name",namedoc).append("calendary.date",date).append("calendary."+hour,""));
+        if (count == 1){
+          //  System.out.println("LIBERO");
+            return true;
+        }else{
+         //   System.out.println("OCCUPATO");
+            return false;
+        }
+    }
+
+    void book(String name, String date, String newhour, String user)
+    {
+        if (libero(name, date, newhour))
+        {
+            Document query = new Document("name", name).append("calendary.date", date);
+
+            Document updateQuery = new Document();
+            updateQuery.put("calendary.$." + newhour, user);
+            doctors.updateOne(query, new Document("$set", updateQuery));
+            System.out.println("Reservation made! :)");
+        }else {
+            System.out.println("We're sorry :( , the slot is already occupied by another patient, please choose another one.");
+        }
+    }
+
+    void show_day(String name, String day )
+    {
+        Bson match = match(eq("name",name));
+        Bson unwind = unwind("$calendary");
+        Bson project = project(fields(excludeId(), include("calendary")));
+        Bson match2 = match(eq("calendary.date",day));
+
+        doctors.aggregate(Arrays.asList(match,unwind,project,match2)).forEach(printDocuments);
+    }
+
+
+    void showEntireCalendar(String name)
+    {
+        Bson match = match(eq("name",name));
+        Bson unwind = unwind("$calendary");
+        Bson project = project(fields(excludeId(), include("calendary")));
+
+        doctors.aggregate(Arrays.asList(match,unwind,project)).forEach(printDocuments);
     }
 
 

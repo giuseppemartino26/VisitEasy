@@ -67,7 +67,9 @@ public class Main {
 
                 switch (option)
                 {
-                    case 9: //SOLO PER PROVARE LE FUNZIONI VELOCEMENTE
+                    case 9:
+                        mdb.libero("Dott. Cosmo Godino","10/01/21","13");
+                        //mdb.show_day("Dott. Cosmo Godino","10/01/21");
 
                     case 1:
 
@@ -216,8 +218,23 @@ public class Main {
                                             }catch (Exception e){ }
 
                                             printDocInfo(nome);
-                                            
-                                            int bo = keyboard.nextInt();
+
+                                            System.out.println("Select 1 if you want to book a medical examination with the doctor");
+
+                                            int book = keyboard.nextInt();
+                                            if (book == 1)
+                                            {
+                                                System.out.println("You can book a medical examination in an empty slot");
+                                                mdb.showEntireCalendar(nome);
+
+                                                System.out.println("Insert the data of the medical examination you want to book");
+                                                String date = keyboard.next();
+                                                System.out.println("Insert the hour");
+                                                String hour = keyboard.next();
+
+                                                mdb.book(nome,date,hour,user.getUsername());
+
+                                            }
 
 
 
