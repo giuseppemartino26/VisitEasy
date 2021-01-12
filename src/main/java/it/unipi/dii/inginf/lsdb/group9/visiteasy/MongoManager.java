@@ -272,15 +272,19 @@ boolean add_administrator(Administrator administrator) {
         }
     }
 
+    /*se lo slot è libero inserisco l'appuntamento sia nella collection doctors che in users */
     void book(String name, String date, String newhour, String user)
     {
         if (libero(name, date, newhour))
         {
             Document query = new Document("name", name).append("calendary.date", date);
-
             Document updateQuery = new Document();
             updateQuery.put("calendary.$." + newhour, user);
             doctors.updateOne(query, new Document("$set", updateQuery));
+
+            Document newres = new Document("date",date).append("hour",newhour).append("doctor",name);
+            users.updateOne(eq("username",user),Updates.push("reservations",newres));
+
             System.out.println("Reservation made! :)");
         }else {
             System.out.println("We're sorry :( , the slot is already occupied by another patient, please choose another one.");
@@ -306,6 +310,16 @@ boolean add_administrator(Administrator administrator) {
 
         doctors.aggregate(Arrays.asList(match,unwind,project)).forEach(printDocuments);
     }
+
+    void showUserReservations(String user)
+    {
+        Bson match = match(eq("username",user));
+        Bson project = project(fields(excludeId(), include("reservations")));
+
+        users.aggregate(Arrays.asList(match,project)).forEach(printDocuments);
+    }
+
+
 
 
 
