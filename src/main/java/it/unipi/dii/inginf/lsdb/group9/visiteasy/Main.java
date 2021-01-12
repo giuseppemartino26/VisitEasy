@@ -68,7 +68,7 @@ public class Main {
                 switch (option)
                 {
                     case 9:
-                        //mdb.showUserReservations("giuseppe");
+
 
                     case 1:
 
@@ -174,7 +174,7 @@ public class Main {
 
                                                 System.out.println("***USER: " + username + "***" +
                                                         "\nSelect:" +
-                                                        "\n1 to find a user" +
+                                                        "\n1 to find a doctor" +
                                                         "\n2 to see all your reservations" +
                                                         "\n0 to come back to the login page");
                                                 int com = keyboard.nextInt();
@@ -200,7 +200,6 @@ public class Main {
                                                         System.out.println("Choose the doctors by: (select a command)" +
                                                                 "\n1. Show the entire list" +
                                                                 "\n2. Sort by ascendent price (most 3 cheapest doctors)" +
-                                                                "\n3. Doctors most reviewed" +
                                                                 "\n4. Doctors recommended by the system");
 
                                                         int sort = keyboard.nextInt();
@@ -249,6 +248,29 @@ public class Main {
                                                         continue;
                                                     case 2:
                                                         mdb.showUserReservations(username);
+
+                                                        System.out.println("Select 1 if you want to delete a reservation");
+                                                        int d = keyboard.nextInt();
+                                                        if (d == 1)
+                                                        {
+                                                            System.out.println("Select the examination's date");
+                                                            String date = keyboard.next();
+                                                            System.out.println("Select the hour");
+                                                            String hour = keyboard.next();
+                                                            System.out.println("Write the doctor's name:");
+                                                            InputStreamReader inp = new InputStreamReader(System.in);
+                                                            BufferedReader tast = new BufferedReader(inp);
+
+                                                            String docname = null;
+                                                            try {
+                                                                docname = tast.readLine();
+                                                            } catch (Exception e) {
+                                                            }
+
+
+                                                            mdb.freeSlot(username,docname,date,hour);
+                                                        }
+
 
                                                     case 0:
                                                         break;

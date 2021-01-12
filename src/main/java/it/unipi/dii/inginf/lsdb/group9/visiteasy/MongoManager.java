@@ -5,6 +5,7 @@ import com.mongodb.client.*;
 import  java.util.*;
 import java.lang.*;
 import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Administrator;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
@@ -14,6 +15,7 @@ import org.bson.conversions.Bson;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
+import javax.print.Doc;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
@@ -250,6 +252,48 @@ boolean add_administrator(Administrator administrator) {
         }
     }
 
+ /* Elimina tutte le prenotazioni il cui giorno rientra in un range di date, dal calendario dei dottori e dalle prenotazioni degli utenti*/
+    void deleteReservation()
+    {
+        DateTime start = DateTime.now().minusDays(2);
+        DateTime end = start.plusWeeks(1);
+
+        List<DateTime> between = getDateRange(start, end);
+
+        for (DateTime d : between)
+        {
+            Bson delete = Updates.pull("calendary", new Document("date", d.toString(DateTimeFormat.shortDate())));
+            Bson deleteu = Updates.pull("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())));
+            doctors.updateMany(new Document(), delete);
+            users.updateMany(new Document(),deleteu);
+        }
+    }
+
+    void freeSlot(String user, String doctor, String date, String hour)
+    {
+        long count = doctors.countDocuments(new Document("name",doctor).append("calendary.date",date).append("calendary."+hour,user));
+
+        if (count == 1)
+        {
+            Document query = new Document("name", doctor).append("calendary.date", date);
+            Document updateQuery = new Document();
+            updateQuery.put("calendary.$." + hour, "");
+            doctors.updateOne(query, new Document("$set", updateQuery));
+
+            Bson match = new Document("username",user);
+            Bson deleteu = Updates.pull("reservations", new Document("date", date));
+            users.updateOne(match,deleteu);
+
+            System.out.println("Reservation deleted");
+
+        }else {
+            System.out.println("ERROR: There is not present any your reservation in the selected slot");
+        }
+
+
+    }
+
+
     /*aggiunge un nuovo orario al calendario del dottore */
     void aggiungi_ora(String username, String date, String newhour)
     {
@@ -271,6 +315,8 @@ boolean add_administrator(Administrator administrator) {
             return false;
         }
     }
+
+
 
     /*se lo slot è libero inserisco l'appuntamento sia nella collection doctors che in users */
     void book(String name, String date, String newhour, String user)
@@ -318,6 +364,8 @@ boolean add_administrator(Administrator administrator) {
 
         users.aggregate(Arrays.asList(match,project)).forEach(printDocuments);
     }
+
+
 
 
 
