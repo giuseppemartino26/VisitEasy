@@ -5,11 +5,14 @@ import com.mongodb.client.*;
 import  java.util.*;
 import java.lang.*;
 import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.BsonField;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Administrator;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Doctor;
+import org.bson.BsonDocument;
+import org.bson.BsonString;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.joda.time.DateTime;
@@ -35,9 +38,9 @@ import static com.mongodb.client.model.Sorts.descending;
 public class MongoManager {
 
     MongoClient mongoClient = MongoClients.create();
-    MongoDatabase db = mongoClient.getDatabase("progetto");
+    MongoDatabase db = mongoClient.getDatabase("doctors");
     MongoCollection<Document> users = db.getCollection("users");
-    MongoCollection<Document> doctors = db.getCollection("doctors2");
+    MongoCollection<Document> doctors = db.getCollection("doctors");
     MongoCollection<Document> administrators = db.getCollection("administrator");
 
     Consumer<Document> printDocuments = document -> {System.out.println(document.toJson());};
@@ -60,9 +63,9 @@ public class MongoManager {
 
     boolean add_doctor(Doctor doctor)
     {
-        if (users.countDocuments(new Document("username", doctor.getUsername())) == 0) {
-            Document doc = new Document("username", doctor.getUsername()).append("password", doctor.getPassword()).append("name", doctor.getName()).append("city", doctor.getCity()).append("bio", doctor.getBio()).append("specialization", doctor.getSpecialization()).append("address", doctor.getAddress()).append("price", doctor.getPrice());
-            users.insertOne(doc);
+        if (doctors.countDocuments(new Document("username", doctor.getUsername())) == 0) {
+            Document doc = new Document("username", doctor.getUsername()).append("password", doctor.getPassword()).append("price", doctor.getPrice()).append("city", doctor.getCity()).append("name", doctor.getName()).append("specialization", doctor.getSpecialization()).append("bio", doctor.getBio()).append("address", doctor.getAddress());
+            doctors.insertOne(doc);
             return true;
         } else return false;
     }
@@ -131,19 +134,19 @@ public class MongoManager {
         else{
             System.out.println("Incorrect password");
 
-        return false;}
+            return false;}
     }
 
     // ADD ADMINISTRATOR BY ADMINISTRATOR
-boolean add_administrator(Administrator administrator) {
+    boolean add_administrator(Administrator administrator) {
 
-    if (administrators.countDocuments(new Document("username", administrator.getUsername())) == 0) {
-        Document doc = new Document("username", administrator.getUsername()).append("password", administrator.getPassword());
-        administrators.insertOne(doc);
-        return true;
-    } else return false;
+        if (administrators.countDocuments(new Document("username", administrator.getUsername())) == 0) {
+            Document doc = new Document("username", administrator.getUsername()).append("password", administrator.getPassword());
+            administrators.insertOne(doc);
+            return true;
+        } else return false;
 
-}
+    }
 
 
 
@@ -199,7 +202,7 @@ boolean add_administrator(Administrator administrator) {
     }
 
 
-//DELETE USER
+    //DELETE USER
     boolean delete_user_by_the_administrator(User user)
     {
         Document result = users.find(eq("username", user.getUsername())).first();
@@ -224,7 +227,7 @@ boolean add_administrator(Administrator administrator) {
         return true;
     }
 
-      /* Restituisce una lista di date dalla data start a quella di end*/
+    /* Restituisce una lista di date dalla data start a quella di end*/
     public static List<DateTime> getDateRange(DateTime start, DateTime end)
     {
         List<DateTime> ret = new ArrayList<DateTime>();
@@ -236,10 +239,10 @@ boolean add_administrator(Administrator administrator) {
         return ret;
     }
 
-     /* Aggiunge il calendario al dottore che ha username = us dalla data che decide il dottore fino a 1 anno o quello che è     ( tutte le date hanno orari uguali che sceglie il dottore) */
+    /* Aggiunge il calendario al dottore che ha username = us dalla data che decide il dottore fino a 1 anno o quello che è     ( tutte le date hanno orari uguali che sceglie il dottore) */
     void aggiungi_cal3(String us, String ora1, String ora2, String ora3, String start_date)
     {
-       // DateTime start = DateTime.now().withTimeAtStartOfDay();
+        // DateTime start = DateTime.now().withTimeAtStartOfDay();
         DateTime start = DateTime.parse(start_date);
         DateTime end = start.plusYears(1);
 
@@ -252,7 +255,7 @@ boolean add_administrator(Administrator administrator) {
         }
     }
 
- /* Elimina tutte le prenotazioni il cui giorno rientra in un range di date, dal calendario dei dottori e dalle prenotazioni degli utenti*/
+    /* Elimina tutte le prenotazioni il cui giorno rientra in un range di date, dal calendario dei dottori e dalle prenotazioni degli utenti*/
     void deleteReservation()
     {
         DateTime start = DateTime.now().minusDays(2);
@@ -308,10 +311,10 @@ boolean add_administrator(Administrator administrator) {
     {
         long count = doctors.countDocuments(new Document("name",namedoc).append("calendary.date",date).append("calendary."+hour,""));
         if (count == 1){
-          //  System.out.println("LIBERO");
+            //  System.out.println("LIBERO");
             return true;
         }else{
-         //   System.out.println("OCCUPATO");
+            //   System.out.println("OCCUPATO");
             return false;
         }
     }
@@ -366,25 +369,49 @@ boolean add_administrator(Administrator administrator) {
     }
 
 
+    //Analytics svg users
+    void printAvgUsers(){
+        AggregateIterable<org.bson.Document> aggregate = users.aggregate(Arrays.asList(Aggregates.group("_id", new BsonField("averageAge", new BsonDocument("$avg", new BsonString("$age"))))));
+        Document result = aggregate.first();
+        double age = result.getDouble("averageAge");
+        System.out.println("the avarege of the age of the user is: ");
+        System.out.println(age);
 
-
-
-
-
-
-    //ADD NEW DOCTOR BY ADMINISTRATOR
-   /* boolean add_new_doctor_by_administrator(Doctor doctor)
-    {
-        if (users.countDocuments(new Document("username", user.getUsername())) == 0) {
-            Document doc = new Document("username", user.getUsername()).append("password", user.getPassword()).append("age", user.getAge());
-            users.insertOne(doc);
-            return true;
-        } else return false;
     }
+    //Analytics most expensive specialization
+   /* void printMostExpSpec(){
+        Bson group1 = new Document("$group", new Document("_id", new Document("specialization", "$specialization")
+                .append("totalPrice", new Document("$sum", "$price"))));
+        Bson project1 = project(fields(excludeId(), computed("specialization", "$_id.specialization"),
+                 include("price")));
+        Bson group2 = group("$specialization", avg("avgPriceSpec", "$price"));
+        Bson project2 = project(fields(excludeId(), computed("specialization", "$_id"), include("avgPriceSpec")));
+        //AggregateIterable<org.bson.Document> aggregate = doctors.aggregate(Arrays.asList(Aggregates.group("specialization", new BsonField("averagePrice", new BsonDocument("$avg", new BsonString("$price"))))));
+        //Document result = aggregate.first();
+        //double price = result.getDouble("averagePrice");
+       // System.out.println("The most expensive specialization is ");
+       //System.out.println(price);
+        doctors.aggregate(Arrays.asList(group1, project1, group2, project2))
+                .forEach(printDocuments);
+
+    }*/
+    void printMostExpSpec(){
+        Bson group1 = new Document("$group", new Document("_id", new Document("specialization", "$specialization"))
+                                .append("totalPrice", new Document("$avg", "$price")));
+        Bson project1 = project(fields(excludeId(), computed("specialization", "$_id.specialization"),
+                include("totalPrice")));
+        doctors.aggregate(Arrays.asList(group1, project1))
+                .forEach(printDocuments);
+        
+    }
+
+
+
+
+
 
     /*void populate_doctors_from_file(String path)
     {
-
         List<Document> observationDocuments = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(path));) {
             String line;
@@ -394,14 +421,10 @@ boolean add_administrator(Administrator administrator) {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
         doctors.insertMany(observationDocuments);
     }
-
-
     void populate_users_from_file(String path)
     {
-
         List<Document> observationDocuments = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(path));) {
             String line;
@@ -411,12 +434,10 @@ boolean add_administrator(Administrator administrator) {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
         users.insertMany(observationDocuments);
     }
-
     public void populate_doctors_from_file() {
     }
     public void populate_users_from_file() {
     }*/
-    }
+}
