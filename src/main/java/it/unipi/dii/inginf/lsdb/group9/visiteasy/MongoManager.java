@@ -396,11 +396,18 @@ public class MongoManager {
 
     }*/
     void printMostExpSpec(){
+
         Bson group1 = new Document("$group", new Document("_id", new Document("specialization", "$specialization"))
-                                .append("totalPrice", new Document("$avg", "$price")));
+                                .append("AvgPrice", new Document("$avg", "$price")));
         Bson project1 = project(fields(excludeId(), computed("specialization", "$_id.specialization"),
-                include("totalPrice")));
-        doctors.aggregate(Arrays.asList(group1, project1))
+                include("AvgPrice")));
+        //doctors.aggregate(Arrays.asList(group1, project1));
+                //.forEach(printDocuments);
+
+        Bson sort = sort(descending("AvgPrice"));
+        Bson limit = limit(3);
+        System.out.println("The three most expensive specialization are: ");
+        doctors.aggregate(Arrays.asList(group1, project1, sort, limit))
                 .forEach(printDocuments);
         
     }
