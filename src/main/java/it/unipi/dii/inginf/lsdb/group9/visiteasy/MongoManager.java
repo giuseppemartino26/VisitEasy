@@ -38,15 +38,26 @@ import static com.mongodb.client.model.Sorts.descending;
 public class MongoManager {
 
     MongoClient mongoClient = MongoClients.create();
-    MongoDatabase db = mongoClient.getDatabase("doctors");
+    MongoDatabase db = mongoClient.getDatabase("progetto");
     MongoCollection<Document> users = db.getCollection("users");
-    MongoCollection<Document> doctors = db.getCollection("doctors");
+    MongoCollection<Document> doctors = db.getCollection("doctors2");
     MongoCollection<Document> administrators = db.getCollection("administrator");
 
     Consumer<Document> printDocuments = document -> {System.out.println(document.toJson());};
     Consumer<Document> printvalue = document -> {System.out.println(document.getString("_id"));};
     Consumer<Document> printnamedoc = document -> {System.out.println(document.getString("name"));};
     Consumer<Document> printcale = document -> {System.out.println(document.getString("calendario"));};
+    Consumer<Document> printnum = document -> {System.out.println(document.getInteger("count"));};
+    Consumer<Document> printnum2 = document -> {
+
+    int a = document.getInteger("count");
+
+    };
+
+
+
+
+
 
 
     Scanner keyboard = new Scanner(System.in);
@@ -227,7 +238,7 @@ public class MongoManager {
         return true;
     }
 
-    /* Restituisce una lista di date dalla data start a quella di end*/
+      /* Restituisce una lista di date dalla data start a quella di end*/
     public static List<DateTime> getDateRange(DateTime start, DateTime end)
     {
         List<DateTime> ret = new ArrayList<DateTime>();
@@ -239,23 +250,10 @@ public class MongoManager {
         return ret;
     }
 
-    /* Aggiunge il calendario al dottore che ha username = us dalla data che decide il dottore fino a 1 anno o quello che è     ( tutte le date hanno orari uguali che sceglie il dottore) */
-    void aggiungi_cal3(String us, String ora1, String ora2, String ora3, String start_date)
-    {
-        // DateTime start = DateTime.now().withTimeAtStartOfDay();
-        DateTime start = DateTime.parse(start_date);
-        DateTime end = start.plusYears(1);
+     /* Aggiunge il calendario al dottore che ha username = us dalla data che decide il dottore fino a 1 anno o quello che è     ( tutte le date hanno orari uguali che sceglie il dottore) */
 
-        List<DateTime> between = getDateRange(start, end);
 
-        for (DateTime d : between)
-        {
-            Document newdoc = new Document("date", d.toString(DateTimeFormat.shortDate())).append(ora1,"").append(ora2,"").append(ora3,"");
-            doctors.updateMany(eq("username",us), Updates.push("calendario",newdoc));
-        }
-    }
-
-    /* Elimina tutte le prenotazioni il cui giorno rientra in un range di date, dal calendario dei dottori e dalle prenotazioni degli utenti*/
+ /* Elimina tutte le prenotazioni il cui giorno rientra in un range di date, dal calendario dei dottori e dalle prenotazioni degli utenti*/
     void deleteReservation()
     {
         DateTime start = DateTime.now().minusDays(2);
@@ -272,16 +270,33 @@ public class MongoManager {
         }
     }
 
-    void freeSlot(String user, String doctor, String date, String hour)
+    boolean trovato(String namedoc,String date,String patient)
     {
-        long count = doctors.countDocuments(new Document("name",doctor).append("calendary.date",date).append("calendary."+hour,user));
+        Bson match = match(eq("name",namedoc));
+        Bson unwind = unwind("$calendar");
+        Bson match2 = match(and(eq("calendar.date",date),eq("calendar.patient",patient)));
+        Bson count = count();
 
-        if (count == 1)
+        int b;
+        try
+        { b = doctors.aggregate(Arrays.asList(match, unwind, match2, count)).first().getInteger("count");
+            System.out.println(b);
+        }catch (NullPointerException e){
+            System.out.println("NON HO TROVATO NIENTE");
+            return false;
+        }
+        System.out.println("HO TROVATO");
+        return true; //ha trovato quello che gli passo nei parametri
+
+    }
+
+    /* Libera una prenotazione*/
+    void freeSlot(String user, String doctor, String date)
+    {
+        /* Mi assicuro che lo slot che voglio eliminare sia proprio quello dell'utente che ha fatto il login*/
+        if (trovato(doctor,date,user))
         {
-            Document query = new Document("name", doctor).append("calendary.date", date);
-            Document updateQuery = new Document();
-            updateQuery.put("calendary.$." + hour, "");
-            doctors.updateOne(query, new Document("$set", updateQuery));
+            doctors.updateOne(new Document("name",doctor).append("calendar.date",date),Updates.set("calendar.$.patient",""));
 
             Bson match = new Document("username",user);
             Bson deleteu = Updates.pull("reservations", new Document("date", date));
@@ -292,8 +307,6 @@ public class MongoManager {
         }else {
             System.out.println("ERROR: There is not present any your reservation in the selected slot");
         }
-
-
     }
 
 
@@ -307,37 +320,48 @@ public class MongoManager {
         doctors.updateOne(query,new Document("$set",updateQuery));
     }
 
-    boolean libero(String namedoc,String date, String hour)
+
+    /*se lo slot è libero inserisco l'appuntamento sia nella collection doctors che in users */
+    void book(String name, String date, String user)
     {
-        long count = doctors.countDocuments(new Document("name",namedoc).append("calendary.date",date).append("calendary."+hour,""));
-        if (count == 1){
-            //  System.out.println("LIBERO");
-            return true;
-        }else{
-            //   System.out.println("OCCUPATO");
-            return false;
+        if (users.countDocuments(new Document("username",user).append("reservations.date",date)) == 0)
+        {
+            if (trovato(name, date, "")) {
+                doctors.updateOne(new Document("name", name).append("calendar.date", date), Updates.set("calendar.$.patient", user));
+
+                Document newres = new Document("date", date).append("doctor", name);
+                users.updateOne(eq("username", user), Updates.push("reservations", newres));
+
+                System.out.println("Reservation made! :)");
+            } else {
+                System.out.println("We're sorry :( , the slot is already occupied by another patient, please choose another one.");
+            }
+        }else {
+            System.out.println("ERROR: You already have a reservation in this datetime");
         }
     }
 
 
-
-    /*se lo slot è libero inserisco l'appuntamento sia nella collection doctors che in users */
-    void book(String name, String date, String newhour, String user)
+    void aggiungi_cal4()
     {
-        if (libero(name, date, newhour))
+        ArrayList<String> ore = new ArrayList<>();
+        ore.add("15:00");
+        ore.add("16:30");
+
+        DateTime start = DateTime.now();
+        DateTime end = start.plusWeeks(1);
+
+        List<DateTime> between = getDateRange(start, end);
+
+        for (DateTime d : between)
         {
-            Document query = new Document("name", name).append("calendary.date", date);
-            Document updateQuery = new Document();
-            updateQuery.put("calendary.$." + newhour, user);
-            doctors.updateOne(query, new Document("$set", updateQuery));
-
-            Document newres = new Document("date",date).append("hour",newhour).append("doctor",name);
-            users.updateOne(eq("username",user),Updates.push("reservations",newres));
-
-            System.out.println("Reservation made! :)");
-        }else {
-            System.out.println("We're sorry :( , the slot is already occupied by another patient, please choose another one.");
+            for (String o : ore)
+            {
+                Document newres = new Document("date",d.toString(DateTimeFormat.shortDate())+" "+o).append("patient","");
+                doctors.updateMany(new Document("name","Dott. Cosmo Godino"),Updates.push("calendar",newres));
+            }
         }
+
     }
 
     void show_day(String name, String day )
@@ -350,22 +374,29 @@ public class MongoManager {
         doctors.aggregate(Arrays.asList(match,unwind,project,match2)).forEach(printDocuments);
     }
 
-
+/* Mostra tutti gli slot disponibili di un dottore */
     void showEntireCalendar(String name)
     {
         Bson match = match(eq("name",name));
-        Bson unwind = unwind("$calendary");
-        Bson project = project(fields(excludeId(), include("calendary")));
+        Bson unwind = unwind("$calendar");
+        Bson match2 = match(eq("calendar.patient",""));
+        Bson project = project(fields(excludeId(), include("calendar")));
 
-        doctors.aggregate(Arrays.asList(match,unwind,project)).forEach(printDocuments);
+        doctors.aggregate(Arrays.asList(match,unwind,match2,project)).forEach(printDocuments);
     }
 
     void showUserReservations(String user)
     {
         Bson match = match(eq("username",user));
+        Bson unwind = unwind("$reservations");
         Bson project = project(fields(excludeId(), include("reservations")));
 
-        users.aggregate(Arrays.asList(match,project)).forEach(printDocuments);
+        users.aggregate(Arrays.asList(match,unwind,project)).forEach(printDocuments);
+    }
+
+    void esiste ()
+    {
+      System.out.println(users.countDocuments(new Document("username","giuseppe").append("reservations.date","01/01/21")));
     }
 
 
@@ -374,7 +405,7 @@ public class MongoManager {
         AggregateIterable<org.bson.Document> aggregate = users.aggregate(Arrays.asList(Aggregates.group("_id", new BsonField("averageAge", new BsonDocument("$avg", new BsonString("$age"))))));
         Document result = aggregate.first();
         double age = result.getDouble("averageAge");
-        System.out.println("the avarege of the age of the user is: ");
+        System.out.println("the averege of the age of the user is: ");
         System.out.println(age);
 
     }
@@ -409,7 +440,7 @@ public class MongoManager {
         System.out.println("The three most expensive specialization are: ");
         doctors.aggregate(Arrays.asList(group1, project1, sort, limit))
                 .forEach(printDocuments);
-        
+
     }
 
 
