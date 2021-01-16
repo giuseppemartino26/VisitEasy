@@ -42,8 +42,8 @@ import static com.mongodb.client.model.Sorts.descending;
 
 public class MongoManager {
 
-    MongoClient mongoClient = MongoClients.create();
-    MongoDatabase db = mongoClient.getDatabase("doctors");
+    MongoClient mongoClient = MongoClients.create("");
+    MongoDatabase db = mongoClient.getDatabase("");
     MongoCollection<Document> users = db.getCollection("users");
     MongoCollection<Document> doctors = db.getCollection("doctors");
     MongoCollection<Document> administrators = db.getCollection("administrator");
@@ -218,6 +218,13 @@ public class MongoManager {
         return  doctor;
     }
 
+    Doctor getMyProfile(String username)
+    {
+        Document result = doctors.find(eq("username", username)).first();
+        Doctor doctor = new Doctor(result.getString("name"),result.getInteger("price"),result.getString("address"),result.getString("bio"));
+        return  doctor;
+    }
+
 
     //DELETE USER
     boolean delete_user_by_the_administrator(User user)
@@ -320,6 +327,54 @@ public class MongoManager {
         }else {
             System.out.println("ERROR: You already have a reservation in this datetime");
         }
+    }
+
+    void deleteDate (){
+
+        ArrayList<String> orari = new ArrayList<>();
+        orari.add(" 09:00");
+        orari.add(" 09:30");
+        orari.add(" 10:00");
+        orari.add(" 10:30");
+        orari.add(" 11:00");
+        orari.add(" 11:30");
+        orari.add(" 12:00");
+        orari.add(" 12:30");
+        orari.add(" 15:00");
+        orari.add(" 15:30");
+        orari.add(" 16:00");
+        orari.add(" 16:30");
+        orari.add(" 17:00");
+        orari.add(" 17:30");
+        orari.add(" 18:00");
+        orari.add(" 18:30");
+
+
+        DateTime start = DateTime.now().minusDays(2);
+        DateTime end = start.plusDays(1);
+        List<DateTime> between = getDateRange(start, end);
+
+
+        for (DateTime d : between)
+        {
+            for (String o : orari)
+            {
+                Bson delete = Updates.pull ("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())+o));
+
+                //Bson delete = delete;
+                doctors.updateMany(new Document(), delete);
+                //users.updateMany(new Document(),delete);
+
+            }
+            //Bson delete = Updates.pull("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())));
+            //doctors.updateMany(new Document(), delete);
+            //users.updateMany(new Document(),delete);
+        }
+
+
+
+
+
     }
 
     /* Elimina tutte le prenotazioni il cui giorno rientra in un range di date, dal reservations dei dottori e dalle prenotazioni degli utenti*/

@@ -4,8 +4,10 @@ import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Administrator;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Doctor;
 import java.io.*;
-
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import  java.util.*;
+import java.util.concurrent.*;
 
 
 
@@ -18,6 +20,7 @@ public class Main {
     BufferedReader tastiera = new BufferedReader(input);
 
     /**/
+
 
     public static void printAllDocList(String city, String spec)
     {
@@ -51,16 +54,47 @@ public class Main {
         System.out.println(doctor.getName()+"\nAddress: "+doctor.getAddress()+"\nprice : "+doctor.getPrice()+"€"+"\nBiography: "+doctor.getBio());
     }
 
+    public static void printMyProfile(String username)
+    {
+        Doctor doctor = mdb.getMyProfile(username);
+        System.out.println(doctor.getUsername()+"\nName: "+doctor.getName()+"\nAddress: "+doctor.getAddress()+"\nprice : "+doctor.getPrice()+"€"+"\nBiography: "+doctor.getBio());
+    }
+
+    public static void printCurrentDate(){
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        LocalDateTime now = LocalDateTime.now();
+        System.out.println("-----Welcome to VisitEasy----- "+
+                "\n Today is: ");
+        System.out.println(dtf.format(now));
+    }
+
+
 
     public static void main(String[] args) {
 
+        Runnable deleteRunnable = new Runnable() {
+            @Override
+            public void run() {
+                mdb.deleteDate();
+            }
+        };
+
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        executor.scheduleAtFixedRate(deleteRunnable, 0, 24, TimeUnit.HOURS);
+
+
+;
 
         while (true)
         {
-            System.out.println("-----Welcome to VisitEasy----- \nSelect a command: \nI'm a:" +
+            printCurrentDate();
+            System.out.println("\nSelect a command: \nI'm a:" +
                     "\n1. Doctor" +
                     "\n2. User" +
                     "\n3. Administrator ");
+
+
+
 
             try {
                 int option = keyboard.nextInt();
@@ -68,7 +102,6 @@ public class Main {
 
                 switch (option)
                 {
-                    case 9:
 
 
                     case 1:
@@ -76,7 +109,9 @@ public class Main {
                         System.out.println("--DOCTOR--\nSelect a command: " +
                                 "\n1. Login" +
                                 "\n2. Sign up" +
-                                "\n\n0. Go back");
+                                "\n\n0. Go back" );
+
+
 
                         try{
                             int option_doctor = keyboard.nextInt();
@@ -102,6 +137,7 @@ public class Main {
                                                     "\n1. see reservations" +
                                                     "\n2. insert dates to your reservations" +
                                                     "\n3. add hour to your reservations" +
+                                                    "\n4. view my profile"+
 
                                                     "\n\n0. Go back");
                                             try{
@@ -119,7 +155,18 @@ public class Main {
                                                         // a doctor can add date to his reservations
                                                         mdb.insert_hour_doctor_reservations(usernameD);
                                                         break;
+                                                    case 4:
+                                                        while (true) {
+                                                            //stampa le sue informazioni
+                                                            printMyProfile(usernameD);
 
+                                                            // TODO Cypher
+
+
+
+
+                                                            break;
+                                                        }
                                                     case 0:
                                                         break;
                                                 }
@@ -130,8 +177,6 @@ public class Main {
                                             }
 
 
-
-                                            //TODO
                                         }
 
                                     }
