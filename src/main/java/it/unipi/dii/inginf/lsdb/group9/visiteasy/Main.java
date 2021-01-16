@@ -12,11 +12,12 @@ import  java.util.*;
 
 public class Main {
 
-   private static MongoManager mdb = new MongoManager();
-   private static Scanner keyboard = new Scanner(System.in);
+    private static MongoManager mdb = new MongoManager();
+    private static Scanner keyboard = new Scanner(System.in);
+    InputStreamReader input = new InputStreamReader(System.in);
+    BufferedReader tastiera = new BufferedReader(input);
 
-
-/**/
+    /**/
 
     public static void printAllDocList(String city, String spec)
     {
@@ -86,8 +87,10 @@ public class Main {
 
                                     while (true)
                                     {
+                                        InputStreamReader input = new InputStreamReader(System.in);
+                                        BufferedReader tastiera = new BufferedReader(input);
                                         System.out.println("--LOGIN DOCTOR--\nInsert the username");
-                                        String usernameD = keyboard.next();
+                                        String usernameD = tastiera.readLine();
                                         System.out.println("Insert the password");
                                         String passwordD = keyboard.next();
 
@@ -95,6 +98,39 @@ public class Main {
                                         if (!mdb.login_doctor(doctor)){
                                             System.out.println("Please retry");
                                         }else {
+                                            System.out.println("--DOCTOR--\nSelect a command: " +
+                                                    "\n1. see reservations" +
+                                                    "\n2. insert dates to your reservations" +
+                                                    "\n3. add hour to your reservations" +
+
+                                                    "\n\n0. Go back");
+                                            try{
+                                                int option_doctor2 = keyboard.nextInt();
+                                                switch (option_doctor2){
+                                                    case 1:
+                                                        //see doctor's reservations
+                                                        mdb.showreservations(usernameD);
+                                                        break;
+                                                    case 2:
+                                                        // a new doctor create the reservations
+                                                        mdb.aggiungi_cal4(usernameD);
+                                                        break;
+                                                    case 3:
+                                                        // a doctor can add date to his reservations
+                                                        mdb.insert_hour_doctor_reservations(usernameD);
+                                                        break;
+
+                                                    case 0:
+                                                        break;
+                                                }
+                                            }
+                                            catch (Exception e){
+                                                System.out.println("ERROR: insert a correct number.");
+                                                continue;
+                                            }
+
+
+
                                             //TODO
                                         }
 
@@ -106,7 +142,7 @@ public class Main {
                                         InputStreamReader input = new InputStreamReader(System.in);
                                         BufferedReader tastiera = new BufferedReader(input);
                                         System.out.println("Insert the username");
-                                        String username =  keyboard.next();
+                                        String username =  tastiera.readLine();
                                         System.out.println("Insert the password");
                                         String password = keyboard.next();
                                         System.out.println("Insert your name");
@@ -161,8 +197,10 @@ public class Main {
                                 case 1: //LOGIN
                                     while (true)
                                     {
+                                        InputStreamReader input = new InputStreamReader(System.in);
+                                        BufferedReader tastiera = new BufferedReader(input);
                                         System.out.println("--LOGIN USER--\nInsert the username");
-                                        String username = keyboard.next();
+                                        String username = tastiera.readLine();
                                         System.out.println("Insert the password");
                                         String password = keyboard.next();
 
@@ -193,7 +231,7 @@ public class Main {
                                                         mdb.display_spec();
 
                                                         System.out.println("Insert the city");
-                                                        String city = keyboard.next();
+                                                        String city = tastiera.readLine();
 
                                                         System.out.println("Insert the specialization");
                                                         String specialization = keyboard.next();
@@ -205,11 +243,11 @@ public class Main {
 
                                                         int sort = keyboard.nextInt();
 
-                                            switch (sort)
-                                            {
-                                                case 1:
-                                                    printAllDocList(city,specialization);
-                                                    break;
+                                                        switch (sort)
+                                                        {
+                                                            case 1:
+                                                                printAllDocList(city,specialization);
+                                                                break;
 
                                                             case 2:
                                                                 printCheapestDocList(city, specialization);
@@ -221,8 +259,7 @@ public class Main {
                                                         }
                                                         System.out.println("Enter the name of the doctor you want to see:");
 
-                                                        InputStreamReader input = new InputStreamReader(System.in);
-                                                        BufferedReader tastiera = new BufferedReader(input);
+
 
                                                         String nome = null;
                                                         try {
@@ -237,7 +274,7 @@ public class Main {
                                                         int book = keyboard.nextInt();
                                                         if (book == 1) {
                                                             System.out.println("----AVAIABLE SLOTS----");
-                                                            mdb.showEntireCalendar(nome);
+                                                            mdb.showEntirereservations(nome);
 
                                                             System.out.println("Insert the data of the medical examination you want to book");
 
@@ -360,6 +397,7 @@ public class Main {
                                         "\n5. delete a user" +
                                         "\n6. show analytics" +
                                         "\n7. populate db" +
+                                        "\n8. update calendar " +
                                         "\n\n0. Go back");
                             }
                             try{
@@ -469,19 +507,23 @@ public class Main {
                                         int analytics_adm = keyboard.nextInt();
 
                                         switch (analytics_adm){
-                                    case 1:
+                                            case 1:
 
-                                         mdb.printAvgUsers();
-                                    case 2:
-                                        mdb.printMostExpSpec();
-                                        break;
-                                    case 0:
-                                        System.out.println("return to the menu");
-                                        break;}
+                                                mdb.printAvgUsers();
+                                            case 2:
+                                                mdb.printMostExpSpec();
+                                                break;
+                                            case 0:
+                                                System.out.println("return to the menu");
+                                                break;}
                                     case 7:
                                         //populate db
                                         //System.out.println("filling the database with doctors");
                                         //mdb.populate_doctors_from_file();
+                                        break;
+                                    case 8:
+
+                                        mdb.deleteReservation("1a");
                                         break;
 
                                     case 0:
