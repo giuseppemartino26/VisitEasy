@@ -1,6 +1,7 @@
 package it.unipi.dii.inginf.lsdb.group9.visiteasy;
 
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Administrator;
+import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Reservation;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Doctor;
 import java.io.*;
@@ -18,8 +19,6 @@ public class Main {
     private static Scanner keyboard = new Scanner(System.in);
     InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader tastiera = new BufferedReader(input);
-
-    /**/
 
 
     public static void printAllDocList(String city, String spec)
@@ -68,6 +67,17 @@ public class Main {
         System.out.println(dtf.format(now));
     }
 
+    public static void printSlots(String name){
+        ArrayList<Reservation> list = new ArrayList<>();
+        list = mdb.showEntirereservations(name);
+
+        System.out.println("---ALL AVAIABLE SLOTS---");
+        for (int i = 0; i < list.size(); i++)
+        {
+            System.out.println(list.get(i).getDate());
+        }
+    }
+
 
 
     public static void main(String[] args) {
@@ -83,7 +93,7 @@ public class Main {
         executor.scheduleAtFixedRate(deleteRunnable, 0, 24, TimeUnit.HOURS);
 
 
-;
+
 
         while (true)
         {
@@ -93,15 +103,19 @@ public class Main {
                     "\n2. User" +
                     "\n3. Administrator ");
 
-
-
-
             try {
                 int option = keyboard.nextInt();
 
 
                 switch (option)
                 {
+                    case 9:
+                       ArrayList<Reservation> lista = mdb.showEntirereservations("Dott. Cosmo Godino");
+                       for (int i = 0; i< lista.size(); i++)
+                       {
+                           System.out.println(lista.get(i).getDate());
+                       }
+                       return;
 
 
                     case 1:
@@ -109,9 +123,7 @@ public class Main {
                         System.out.println("--DOCTOR--\nSelect a command: " +
                                 "\n1. Login" +
                                 "\n2. Sign up" +
-                                "\n\n0. Go back" );
-
-
+                                "\n\n0. Go back");
 
                         try{
                             int option_doctor = keyboard.nextInt();
@@ -318,8 +330,8 @@ public class Main {
 
                                                         int book = keyboard.nextInt();
                                                         if (book == 1) {
-                                                            System.out.println("----AVAIABLE SLOTS----");
-                                                            mdb.showEntirereservations(nome);
+
+                                                            printSlots(nome);
 
                                                             System.out.println("Insert the data of the medical examination you want to book");
 
@@ -332,8 +344,10 @@ public class Main {
                                                             } catch (Exception e) {
                                                             }
 
+                                                            Reservation reservation = new Reservation(nome,date1,user.getUsername());
 
-                                                            mdb.book(nome, date1, user.getUsername());
+
+                                                            mdb.book(reservation);
                                                         }
 
                                                         continue;
@@ -364,8 +378,9 @@ public class Main {
                                                             } catch (Exception e) {
                                                             }
 
+                                                            Reservation reservation = new Reservation(docname,date,username);
 
-                                                            mdb.freeSlot(username,docname,date);
+                                                            mdb.freeSlot(reservation);
                                                         }
 
 
