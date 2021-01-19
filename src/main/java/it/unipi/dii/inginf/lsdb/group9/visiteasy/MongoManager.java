@@ -54,10 +54,10 @@ public class MongoManager {
 
     public MongoManager()
     {
-        mongoClient = MongoClients.create();
+        mongoClient = MongoClients.create("mongodb://localhost");
         db = mongoClient.getDatabase("progetto");
         users = db.getCollection("users");
-        doctors = db.getCollection("doctors");
+        doctors = db.getCollection("doctors2");
         administrators = db.getCollection("administrator");
     }
 
@@ -195,7 +195,7 @@ public class MongoManager {
     }
 
 
-    ArrayList<Doctor> getDocByCitySpec(String city, String specialization)
+    public ArrayList<Doctor> getDocByCitySpec(String city, String specialization)
     {
         ArrayList<Doctor> doclist = new ArrayList<>();
 
@@ -209,7 +209,7 @@ public class MongoManager {
     }
 
 
-    ArrayList<Doctor> cheapestDoc(String city, String specialization)
+    public ArrayList<Doctor> cheapestDoc(String city, String specialization)
     {
         ArrayList<Doctor> doclist = new ArrayList<>();
 
@@ -226,14 +226,14 @@ public class MongoManager {
         return doclist;
     }
 
-    Doctor getDocInfo(String name)
+    public Doctor getDocInfo(String name)
     {
         Document result = doctors.find(eq("name", name)).first();
         Doctor doctor = new Doctor(result.getString("name"),result.getInteger("price"),result.getString("address"),result.getString("bio"));
         return  doctor;
     }
 
-    Doctor getMyProfile(String username)
+    public Doctor getMyProfile(String username)
     {
         Document result = doctors.find(eq("username", username)).first();
         Doctor doctor = new Doctor(result.getString("name"),result.getInteger("price"),result.getString("address"),result.getString("bio"));
@@ -341,7 +341,7 @@ public class MongoManager {
             System.out.println("NON HO TROVATO NIENTE");
             return false;
         }
-        System.out.println("HO TROVATO");
+        System.out.println("");
         return true; //ha trovato quello che gli passo nei parametri
 
     }
@@ -615,7 +615,7 @@ public class MongoManager {
 
 
     /* Mostra tutti gli slot disponibili di un dottore */
-    ArrayList<Reservation> showEntirereservations(String name)
+    public ArrayList<Reservation> showEntirereservations(String name)
     {
         ArrayList<Reservation> datelibere = new ArrayList<>();
         Consumer<Document> printcale = document -> {
