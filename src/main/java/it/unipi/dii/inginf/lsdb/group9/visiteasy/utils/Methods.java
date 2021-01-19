@@ -6,12 +6,14 @@ import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Reservation;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Doctor;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.MongoManager;
+import org.joda.time.DateTime;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Methods {
@@ -34,7 +36,16 @@ public class Methods {
             System.out.println(doclist.get(i).getName());
         }
     }
-
+    /* Restituisce una lista di date dalla data start a quella di end*/
+    public static List<DateTime> getDateRange(DateTime start, DateTime end) {
+        List<DateTime> ret = new ArrayList<DateTime>();
+        DateTime tmp = start;
+        while (tmp.isBefore(end) || tmp.equals(end)) {
+            ret.add(tmp);
+            tmp = tmp.plusDays(1);
+        }
+        return ret;
+    }
     public static void printCheapestDocList(String city, String spec)
     {
         ArrayList<Doctor> doclist = new ArrayList<>();

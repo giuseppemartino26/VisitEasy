@@ -1,10 +1,12 @@
 package it.unipi.dii.inginf.lsdb.group9.visiteasy.entities;
 
+import java.util.Date;
+
 public class User {
 
     private String username;
     private String password;
-    private int age;
+    private String city;
 
     //COSTRUTTORI
 
@@ -15,10 +17,10 @@ public class User {
 
     }
 
-    public User(String username, String password, int age)
+    public User(String username, String password, String city)
     {
         this(username, password);
-        this.age = age;
+        this.city = city;
     }
 
     public String getUsername(){
@@ -29,11 +31,9 @@ public class User {
         return password;
     }
 
-    public int getAge(){
-        return age;
-    }
+    public String getCity(){return city;}
 
-    public void setAge(int age) {
-        this.age = age;
-    }
+    //public void setAge(int age) {
+        //this.age = age;
+    //}
 }
