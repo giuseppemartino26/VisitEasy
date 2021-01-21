@@ -1,10 +1,8 @@
 package it.unipi.dii.inginf.lsdb.group9.visiteasy.utils;
 
-import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Administrator;
-import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Reservation;
-import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
-import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Doctor;
+import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.*;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.persistance.MongoManager;
+import it.unipi.dii.inginf.lsdb.group9.visiteasy.persistance.Neo4jManager;
 import org.joda.time.DateTime;
 
 import java.io.BufferedReader;
@@ -18,6 +16,8 @@ import java.util.Scanner;
 public class Methods {
 
     private static MongoManager mdb = new MongoManager();
+    private static Neo4jManager ndb = new Neo4jManager("neo4j://localhost:11003", "neo4j", "root");
+
     private static Scanner keyboard = new Scanner(System.in);
     InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader tastiera = new BufferedReader(input);
@@ -89,6 +89,43 @@ public class Methods {
         {
             System.out.println("Date: "+list.get(i).getDate()+" Doctor us: "+list.get(i).getDocusername()+" Doctor name: "+list.get(i).getDocname());
         }
+    }
+
+    public static void printreviews(Doctor doctor)
+    {
+        ArrayList<Review> reviews = ndb.showReviews3(doctor);
+
+        if (reviews.size() > 0) {
+            for (int i = 0; i < reviews.size(); i++) {
+                System.out.println("===================================================================================\n" +
+                        "id_review:" + reviews.get(i).getId() + "\n" + reviews.get(i).getDateTime() + "\n" + reviews.get(i).getUsername() + "\nRating:" + reviews.get(i).getRating() + "\n" + reviews.get(i).getText() + "\nNumber of likes: " + reviews.get(i).getNumLikes());
+            }
+        }else {
+            System.out.println("The doctor doesn't have any reviews yet");
+        }
+    }
+
+   public static String getAlphaNumericString(int n)
+    {
+
+        String AlphaNumericString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                + "0123456789"
+                + "abcdefghijklmnopqrstuvxyz";
+
+        // create StringBuffer size of AlphaNumericString
+        StringBuilder sb = new StringBuilder(n);
+
+        for (int i = 0; i < n; i++) {
+
+            int index
+                    = (int)(AlphaNumericString.length()
+                    * Math.random());
+
+            sb.append(AlphaNumericString
+                    .charAt(index));
+        }
+
+        return sb.toString();
     }
 
 

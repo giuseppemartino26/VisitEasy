@@ -46,18 +46,19 @@ public class MongoManager {
    private final MongoCollection<Document> users;
    private final MongoCollection<Document> doctors;
    private final MongoCollection<Document> administrators;
-   private ClientSession clientSession;
+ //  private ClientSession clientSession;
 
 
     public MongoManager()
     {
-       // mongoClient = MongoClients.create("mongodb://172.16.3.109:27020,172.16.3.110:27020,172.16.3.111:27020/" +
-        //        "?retryWrites=true&w=majority&wtimeout=10000");
-        mongoClient = MongoClients.create("mongodb://localhost");
-        db = mongoClient.getDatabase("doctors");
+        mongoClient = MongoClients.create("mongodb://172.16.3.109:27020,172.16.3.110:27020,172.16.3.111:27020/" +
+               "?retryWrites=true&w=majority&wtimeout=10000");
+      //  mongoClient = MongoClients.create();
+        db = mongoClient.getDatabase("progetto");
         users = db.getCollection("users");
-        doctors = db.getCollection("doctors2");
-        administrators = db.getCollection("Administrator");
+        doctors = db.getCollection("doctors");
+        administrators = db.getCollection("administrator");
+     //   clientSession = mongoClient.startSession();
     }
 
     public MongoClient getMongoClient(){return mongoClient;}
@@ -79,6 +80,11 @@ public class MongoManager {
 
 
     Scanner keyboard = new Scanner(System.in);
+
+    public void closeconnection()
+    {
+        mongoClient.close();
+    }
 
     public String getDocName(String docusername)
     {
@@ -384,7 +390,8 @@ public class MongoManager {
         /* Mi assicuro che lo slot che voglio eliminare sia proprio quello dell'utente che ha fatto il login*/
         if (trovato(doctor,date,user))
         {
-            try (ClientSession clientSession = mongoClient.startSession())
+            ClientSession clientSession = mongoClient.startSession();
+            try
             {
                 clientSession.startTransaction();
 
@@ -422,8 +429,9 @@ public class MongoManager {
         {
             if (trovato(docusername, date, ""))
             {
+                ClientSession clientSession = mongoClient.startSession();
 
-                try (ClientSession clientSession = mongoClient.startSession())
+                try //(ClientSession clientSession = mongoClient.startSession())
                 {
                     clientSession.startTransaction();
 
