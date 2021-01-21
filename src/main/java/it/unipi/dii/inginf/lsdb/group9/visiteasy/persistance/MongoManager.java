@@ -9,6 +9,8 @@ import com.mongodb.client.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+
 import  java.util.*;
 import java.lang.*;
 
@@ -17,9 +19,7 @@ import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Administrator;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Reservation;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Doctor;
-import org.bson.BsonDocument;
-import org.bson.BsonDocumentReader;
-import org.bson.BsonString;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.joda.time.DateTime;
@@ -27,19 +27,15 @@ import org.joda.time.format.DateTimeFormat;
 
 import javax.print.Doc;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
+import static com.mongodb.client.model.Accumulators.sum;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Sorts.ascending;
-import static com.mongodb.client.model.Updates.set;
-import static com.mongodb.client.model.Filters.*;
-import static com.mongodb.client.model.Updates.*;
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Projections.*;
-import static com.mongodb.client.model.Accumulators.*;
-import static com.mongodb.client.model.Accumulators.addToSet;
-import static com.mongodb.client.model.Accumulators.sum;
 import static com.mongodb.client.model.Sorts.descending;
 
 
@@ -80,10 +76,6 @@ public class MongoManager {
     };
     InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader tastiera = new BufferedReader(input);
-
-
-
-
 
 
     Scanner keyboard = new Scanner(System.in);
@@ -134,8 +126,7 @@ public class MongoManager {
 
         String psw = result.getString("password");
         if (psw.equals(user.getPassword())) {
-            int age = result.getInteger("age");
-            user.setAge(age);
+
             System.out.println("Correct credentials");
             return true;
         } else{
@@ -183,7 +174,8 @@ public class MongoManager {
         else{
             System.out.println("Incorrect password");
 
-            return false;}
+            return false;
+        }
     }
 
     // ADD ADMINISTRATOR BY ADMINISTRATOR
@@ -266,10 +258,12 @@ public class MongoManager {
             result.getString("username");
         } catch (NullPointerException exception) {
             System.out.println("The username does not exist");
-            return false;}
-        users.deleteOne(eq("username",user.getUsername()));
+            return false;
+        }
+        users.deleteOne(eq("username", user.getUsername()));
         return true;
     }
+
     //DELETE DOCTOR
     public boolean delete_doctor_by_the_administrator(Doctor doctor)
     {
@@ -278,8 +272,9 @@ public class MongoManager {
             result.getString("username");
         } catch (NullPointerException exception) {
             System.out.println("The username does not exist");
-            return false;}
-        users.deleteOne(eq("username",doctor.getUsername()));
+            return false;
+        }
+        users.deleteOne(eq("username", doctor.getUsername()));
         return true;
     }
 
@@ -569,8 +564,7 @@ public class MongoManager {
         }
     }
     //aggiunge tutto il calendario a tutti i dottori
-    void aggiungi_cal7()
-    {
+    void aggiungi_cal7() {
         ArrayList<String> ore = new ArrayList<>();
         ore.add("09:00");
         ore.add("11:00");
@@ -582,71 +576,43 @@ public class MongoManager {
 
         List<DateTime> between = getDateRange(start, end);
 
-        for (DateTime d : between)
-        {
-            for (String o : ore)
-            {
-                Document newres = new Document("date",d.toString(DateTimeFormat.shortDate())+" "+o).append("patient","");
-                doctors.updateMany(new Document(),Updates.push("reservations",newres));
+        for (DateTime d : between) {
+            for (String o : ore) {
+                Document newres = new Document("date", d.toString(DateTimeFormat.shortDate()) + " " + o).append("patient", "");
+                doctors.updateMany(new Document(), Updates.push("reservations", newres));
             }
         }
 
     }
 
     //genera calendario dottore inserendo giorni da aggiungere e orari da aggiungere
-    public void aggiungi_cal4(String username) throws IOException {
+    void aggiungi_cal4(String username) throws IOException, ParseException {
         ArrayList<String> ore = new ArrayList<>();
         System.out.println("insert how many hours do you want to add");
         int hour = keyboard.nextInt();
-        for(int i=0; i<hour; i++){
+        for (int i = 0; i < hour; i++) {
             System.out.println("insert the hour you want to add");
             String orario = tastiera.readLine();
             ore.add(orario);
         }
 
+        System.out.println("Insert your date of birth nel formato yyyy-MM-dd");
+        String date = tastiera.readLine();
         System.out.println("insert how many days you want add:");
         int day = keyboard.nextInt();
 
-        DateTime start = DateTime.now();
+        DateTime start = DateTime.parse(date);
         DateTime end = start.plusDays(day);
 
         List<DateTime> between = getDateRange(start, end);
 
-        for (DateTime d : between)
-        {
-            for (String o : ore)
-            {
-                Document newres = new Document("date",d.toString(DateTimeFormat.shortDate())+" "+o).append("patient","");
-                doctors.updateMany(new Document("username",username),Updates.push("reservations",newres));
+        for (DateTime d : between) {
+            for (String o : ore) {
+                Document newres = new Document("date", d.toString(DateTimeFormat.shortDate()) + " " + o).append("patient", "");
+                doctors.updateMany(new Document("username", username), Updates.push("reservations", newres));
             }
         }
 
-    }
-    //inserisce nuovo orario al calendario dottore
-
-    public void insert_hour_doctor_reservations(String username) throws IOException {
-
-        System.out.println("insert the date you want to update:");
-        String date = tastiera.readLine();
-        System.out.println("insert the new hour:");
-        String orario = tastiera.readLine();
-
-
-        Document newres = new Document("date",date +" "+orario).append("patient","");
-        doctors.updateOne(new Document("username",username),Updates.push("reservations",newres));
-        System.out.println(newres);
-    }
-
-
-
-    void show_day(String name, String day )
-    {
-        Bson match = match(eq("name",name));
-        Bson unwind = unwind("$reservations");
-        Bson project = project(fields(excludeId(), include("reservations")));
-        Bson match2 = match(eq("reservations.date",day));
-
-        doctors.aggregate(Arrays.asList(match,unwind,project,match2)).forEach(printDocuments);
     }
 
 
@@ -705,18 +671,31 @@ public class MongoManager {
     }
 
 
-
     //Analytics svg users
-    public void printAvgUsers(){
-        AggregateIterable<org.bson.Document> aggregate = users.aggregate(Arrays.asList(Aggregates.group("_id", new BsonField("averageAge", new BsonDocument("$avg", new BsonString("$age"))))));
+   /* void printAvgUsers() {
+        Bson group1 = new Document("$group", new Document("_id", new Document("dateofBirth", "$dateofBirth"))
+                .append("age", new Document("$divide", new Document("$subtract", "$dateOfBirth" ))));
+
+        Bson project1 = project(fields(excludeId(), computed("dateofBirth", "$_id.dateofBirth"),
+                include("age")));
+        Document result = aggregate.first();
+double age= result.getDouble("")
+        System.out.println("the average of the age of the user is: ");
+        System.out.println(dateofBirth);*/
+
+//vecchia funzione
+        /*AggregateIterable<org.bson.Document> aggregate = users.aggregate(Arrays.asList(Aggregates.group("_id", new BsonField("averageAge", new BsonDocument("$avg", new BsonString("$age"))))));
         Document result = aggregate.first();
         double age = result.getDouble("averageAge");
         System.out.println("the average of the age of the user is: ");
         System.out.println(age);
+       }
+        */
 
-    }
-    //Analytics most expensive doctors
-    public void printMostExpSpec(){
+
+
+    //Analytics 3 most expensive specializations
+    void printMostExpSpec() {
 
         Bson group1 = new Document("$group", new Document("_id", new Document("specialization", "$specialization"))
                 .append("AvgPrice", new Document("$avg", "$price")));
@@ -733,6 +712,34 @@ public class MongoManager {
     }
 
 
+        /*public static int calculateAge(LocalDate birthDate, LocalDate currentDate) {
+            int years = Period.between(birthDate, currentDate).getYears();
+            return years;
+        }
+*/
+
+
+// mostra la città in cui ci sono più utenti
+
+    void printmostcity() {
+
+
+
+        Bson unwind = unwind("$city");
+        Bson group = group("$city", sum("count", 1L), Accumulators.push("city", "$city"));
+        Bson sort = sort(descending("count"));
+        Bson limit = limit(3);
+        Bson project = project(fields(excludeId(), computed("city", "$_id"), include("count")));
+
+
+        List<Document> results = users.aggregate(Arrays.asList(unwind, group, sort, limit, project)).into(new ArrayList<>());
+
+        System.out.println("The three most expensive specialization are: ");
+        results.forEach(printDocuments);
+
+
+
+    }
 
 
 

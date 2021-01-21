@@ -8,9 +8,12 @@ import it.unipi.dii.inginf.lsdb.group9.visiteasy.persistance.Neo4jManager;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.utils.Methods;
 import org.joda.time.DateTime;
 
+import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Administrator;
+import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Reservation;
+import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
+import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Doctor;
+import it.unipi.dii.inginf.lsdb.group9.visiteasy.utils.Methods;
 import java.io.*;
-import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;
 import  java.util.*;
 import java.util.concurrent.*;
 
@@ -51,9 +54,9 @@ public class Main {
         {
             Methods.printCurrentDate();
             System.out.println("\nSelect a command: \nI'm a:" +
-                    "\n1. Doctor" +
-                    "\n2. User" +
-                    "\n3. Administrator ");
+                    "\n1. DOCTOR" +
+                    "\n2. USER" +
+                    "\n3. ADMINISTRATOR ");
 
             try {
                 int option = keyboard.nextInt();
@@ -97,39 +100,39 @@ public class Main {
 
                     case 1:
 
-                        System.out.println("--DOCTOR--\nSelect a command: " +
-                                "\n1. Login" +
-                                "\n2. Sign up" +
-                                "\n\n0. Go back");
+                        System.out.println("--DOCTOR--\nWhat do you want to do? " +
+                                "\n1. [Login]" +
+                                "\n2. [Sign up]" +
+                                "\n\n0. [Go back]");
 
-                        try {
+                        try{
                             int option_doctor = keyboard.nextInt();
 
-                            switch (option_doctor) {
+                            switch (option_doctor)
+                            {
                                 case 1: //LOGIN
 
-                                    while (true) {
-                                        InputStreamReader input = new InputStreamReader(System.in);
-                                        BufferedReader tastiera = new BufferedReader(input);
-                                        System.out.println("--LOGIN DOCTOR--\nInsert the username");
+                                    while (true)
+                                    {
+                                        System.out.println("--LOGIN DOCTOR--\nEnter your username: ");
                                         String usernameD = tastiera.readLine();
-                                        System.out.println("Insert the password");
-                                        String passwordD = keyboard.next();
+                                        System.out.println("Enter password: ");
+                                        String passwordD = tastiera.readLine();
 
-                                        Doctor doctor = new Doctor(usernameD, passwordD);
-                                        if (!mdb.login_doctor(doctor)) {
+                                        Doctor doctor = new Doctor(usernameD,passwordD);
+                                        if (!mdb.login_doctor(doctor)){
                                             System.out.println("Please retry");
-                                        } else {
+                                        }else {
                                             System.out.println("--DOCTOR--\nSelect a command: " +
-                                                    "\n1. see reservations" +
-                                                    "\n2. insert dates to your reservations" +
-                                                    "\n3. add hour to your reservations" +
-                                                    "\n4. view my profile" +
+                                                    "\n1. [see reservations]" +
+                                                    "\n2. [insert dates and hour to your reservations]" +
+                                                    "\n3. [view my profile]"+
 
-                                                    "\n\n0. Go back");
-                                            try {
+                                                    "\n\n0. [Go back]");
+                                            try{
+                                                while (true){
                                                 int option_doctor2 = keyboard.nextInt();
-                                                switch (option_doctor2) {
+                                                switch (option_doctor2){
                                                     case 1:
                                                         //see doctor's reservations
                                                         mdb.showreservations(usernameD);
@@ -138,11 +141,8 @@ public class Main {
                                                         // a new doctor create the reservations
                                                         mdb.aggiungi_cal4(usernameD);
                                                         break;
+
                                                     case 3:
-                                                        // a doctor can add date to his reservations
-                                                        mdb.insert_hour_doctor_reservations(usernameD);
-                                                        break;
-                                                    case 4:
                                                         while (true) {
                                                             //stampa le sue informazioni
                                                             Methods.printMyProfile(usernameD);
@@ -153,10 +153,11 @@ public class Main {
                                                             break;
                                                         }
                                                     case 0:
-                                                        break;
-                                                }
-                                            } catch (Exception e) {
-                                                System.out.println("ERROR: insert a correct number.");
+                                                        continue; //torna indietro alla pagina principale
+                                                }}
+                                            }
+                                            catch (Exception e){
+                                                System.out.println("ERROR: enter a correct number.");
                                                 continue;
                                             }
 
@@ -166,26 +167,30 @@ public class Main {
                                     }
 
                                 case 2: //SignUp
-                                    while (true) {
-                                        InputStreamReader input = new InputStreamReader(System.in);
-                                        BufferedReader tastiera = new BufferedReader(input);
-                                        System.out.println("Insert the username");
-                                        String username = tastiera.readLine();
-                                        System.out.println("Insert the password");
-                                        String password = keyboard.next();
-                                        System.out.println("Insert your name");
-                                        String name = tastiera.readLine();
-                                        System.out.println("Insert your city");
-                                        String city = keyboard.next();
-                                        System.out.println("Insert a short bio");
-                                        String bio = tastiera.readLine();
-                                        System.out.println("Insert your specialization");
-                                        String specialization = keyboard.next();
-                                        System.out.println("Insert your address");
-                                        String address = tastiera.readLine();
-                                        System.out.println("Insert price for your visit");
-                                        int price = keyboard.nextInt();
+                                    while (true)
+                                    {
 
+                                        Scanner scan = new Scanner(System.in);
+                                        System.out.println("Insert the username: ");
+                                        String username =  tastiera.readLine();
+                                        System.out.println("Insert the password: ");
+                                        String password = tastiera.readLine();
+                                        System.out.println("Insert your name: ");
+                                        String name = tastiera.readLine();
+                                        System.out.println("Insert your city: ");
+                                        String city = tastiera.readLine();
+                                        System.out.println("Insert a short bio: ");
+                                        String bio = tastiera.readLine();
+                                        System.out.println("Insert your specialization: ");
+                                        String specialization = tastiera.readLine();
+                                        System.out.println("Insert your address: ");
+                                        String address = tastiera.readLine();
+                                        System.out.println("Insert price for your visit: ");
+                                        while(!scan.hasNextInt()) {
+                                            System.out.println("Please enter a number: ");
+                                            scan.nextLine();
+                                        }
+                                        int price = scan.nextInt();
                                         Doctor doctor = new Doctor(username, password, price, name, city, bio, specialization, address);
 
                                         if (!mdb.add_doctor(doctor)) {
@@ -201,10 +206,10 @@ public class Main {
                                     continue; //torna indietro alla pagina principale
 
                                 default:
-                                    System.out.println("insert a correct number");
+                                    System.out.println("insert a correct number: ");
                                     continue;
                             }
-                        } catch (Exception e) {
+                        }catch (Exception e){
                             System.out.println("ERROR: insert a correct number.");
                             continue;
                         }
@@ -403,34 +408,63 @@ public class Main {
 
                                 }
 
-                            case "2": //SignUp
-                                while (true)
-                                {
+                                case 2: //SignUp
+                                    while (true) {
 
-                                    System.out.println("Insert the username");
-                                    String username = keyboard.next();
-                                    System.out.println("Insert the password");
-                                    String password = keyboard.next();
-                                    System.out.println("Insert your age");
-                                    int age = keyboard.nextInt();
+                                        System.out.println("Insert the username");
+                                        String username = tastiera.readLine();
+                                        System.out.println("Insert the password");
+                                        String password = tastiera.readLine();
+                                        System.out.println("Insert city");
+                                        String city = tastiera.readLine();
+                                       /* System.out.println("Insert your date of birth nel formato dd-MM-yyyy");
+                                        String d = tastiera.readLine();
+                                        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                                        sdf.setLenient(false); // strict parsing
 
-                                    User user = new User(username, password, age);
+                                        Date dateofBirth = null;
 
-                                    if (!mdb.add_user(user)) {
-                                        System.out.println("The username is already used. Please choose another one.");
-                                    } else {
-                                        System.out.println("Registration successful!");
-                                        break;
+                                            dateofBirth = sdf.parse(d);
+
+
+                                            GregorianCalendar cal = new GregorianCalendar();
+                                            cal.setTime(dateofBirth);
+
+                                            int giorno = cal.get(Calendar.DAY_OF_MONTH);
+                                            int mese = cal.get(Calendar.MONTH) + 1;
+                                            int anno = cal.get(Calendar.YEAR);
+
+                                            if(giorno>31|| mese>13|| anno>2002){
+                                                System.out.println("ERROR: Insert right date");
+                                                break;
+                                            }
+
+
+*/
+
+                                        User user = new User(username, password, city);
+                                        if (!mdb.add_user(user)) {
+                                            System.out.println("The username is already used. Please choose another one.");
+                                        } else {
+                                            System.out.println("Registration successful!");
+                                            break;
+                                        }
+
+
                                     }
-                                }
 
 
-                            default:
-                                System.out.println("insert a correct number");
+                                        case 0:
+                                    continue; //torna indietro alla pagina principale
+
+                                default:
+                                    System.out.println("insert a correct number");
+                                    continue;
+                            }
+                        }catch (Exception e) {
+                            System.out.println("ERROR: insert a correct number.");
+                            continue;
                         }
-                        //ritorna e chiudi
-                }
-
 
 
                     case 3: //ADMINISTRATOR
@@ -454,8 +488,7 @@ public class Main {
                                         "\n4. delete a doctor" +
                                         "\n5. delete a user" +
                                         "\n6. show analytics" +
-                                        "\n7. populate db" +
-                                        "\n8. update calendar " +
+
                                         "\n\n0. Go back");
                             }
                             try{
@@ -478,8 +511,7 @@ public class Main {
                                         }
                                     case 2:
                                         //add a doctor
-                                        InputStreamReader input = new InputStreamReader(System.in);
-                                        BufferedReader tastiera = new BufferedReader(input);
+
                                         System.out.println("Insert the username");
                                         String usernameD = keyboard.next();
                                         System.out.println("Insert the password");
@@ -512,13 +544,35 @@ public class Main {
                                         {
 
                                             System.out.println("Insert the username");
-                                            String usernameNew = keyboard.next();
+                                            String usernameN = tastiera.readLine();
                                             System.out.println("Insert the password");
-                                            String passwordNew = keyboard.next();
-                                            System.out.println("Insert the age");
-                                            int age = keyboard.nextInt();
+                                            String passwordN = tastiera.readLine();
+                                            System.out.println("Insert city");
+                                            String cityN = tastiera.readLine();
 
-                                            User user = new User(usernameNew, passwordNew, age);
+                                           /* Date dateofBirth = null;
+
+                                            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+                                            sdf.setLenient(false); // strict parsing
+                                            try {
+                                                dateofBirth = sdf.parse(d);
+                                            } catch (ParseException e) {
+                                                e.printStackTrace();
+                                            }
+
+                                            GregorianCalendar cal = new GregorianCalendar();
+                                            cal.setTime(dateofBirth);
+
+                                            int giorno = cal.get(Calendar.DAY_OF_MONTH);
+                                            int mese = cal.get(Calendar.MONTH) + 1;
+                                            int anno = cal.get(Calendar.YEAR);
+                                            if(giorno>31|| mese>13|| anno>2002){
+                                                System.out.println("ERROR: Insert right date");
+                                                break;
+                                            }
+*/
+
+                                            User user = new User(usernameN, passwordN, cityN);
 
                                             if (!mdb.add_user(user)) {
                                                 System.out.println("The username is already used. Please choose another one.");
@@ -537,7 +591,7 @@ public class Main {
                                         if (!mdb.delete_doctor_by_the_administrator(doctorDelete)) {
                                             System.out.println(" username not found. Please choose another one.");
                                         } else {
-                                            System.out.println("username deleted successful!");
+                                            System.out.println("username deleted successfully!");
                                             break;
                                         }
                                         break;
@@ -547,8 +601,8 @@ public class Main {
                                         System.out.println("Insert the username you want to delete");
                                         String usernameDelete = keyboard.next();
                                         String passwordDelete = "ok";
-                                        int age4 = 1;
-                                        User userDelete = new User(usernameDelete, passwordDelete, age4);
+
+                                        User userDelete = new User(usernameDelete, passwordDelete);
                                         if (!mdb.delete_user_by_the_administrator(userDelete)) {
                                             System.out.println(" username not found. Please choose another one.");
                                         } else {
@@ -559,30 +613,25 @@ public class Main {
 
                                     case 6:
                                         System.out.println("--ADMINISTRATOR--\nSelect a command: " +
-                                                "\n1. show avg users" +
+                                                "\n1. show cities with more registered users" +
                                                 "\n2. show the most expensive specialization" +
                                                 "\n\n0. Go back");
                                         int analytics_adm = keyboard.nextInt();
 
                                         switch (analytics_adm){
                                             case 1:
-
-                                                mdb.printAvgUsers();
+                                                mdb.printmostcity();
+                                               // mdb.printAvgUsers();
+                                                break;
                                             case 2:
                                                 mdb.printMostExpSpec();
                                                 break;
                                             case 0:
                                                 System.out.println("return to the menu");
                                                 break;}
-                                    case 7:
-                                        //populate db
-                                        //System.out.println("filling the database with doctors");
-                                        //mdb.populate_doctors_from_file();
-                                        break;
-                                    case 8:
 
-                                        mdb.deleteReservation("1a");
-                                        break;
+
+
 
                                     case 0:
                                         //go back
@@ -592,22 +641,25 @@ public class Main {
                             }catch (Exception e){
                                 System.out.println("ERROR: insert a correct number.");
                             }
-                            //break;
+                            break;
 
                         }
 
 
                     default:
                         System.out.println("Please, insert a number from 1 to 3");
+
                 }
             }catch (Exception e){
                 System.out.println("ERROR: insert a number from 1 to 3.");
             }
 
+            break;
+
 
         }
 
-        // break;
+        //break;
 
     }
 }
