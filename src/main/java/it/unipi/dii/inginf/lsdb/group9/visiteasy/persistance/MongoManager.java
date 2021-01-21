@@ -53,10 +53,10 @@ public class MongoManager {
     {
        // mongoClient = MongoClients.create("mongodb://172.16.3.109:27020,172.16.3.110:27020,172.16.3.111:27020/" +
         //        "?retryWrites=true&w=majority&wtimeout=10000");
-        mongoClient = MongoClients.create();
+        mongoClient = MongoClients.create("mongodb://localhost");
         db = mongoClient.getDatabase("doctors");
         users = db.getCollection("users");
-        doctors = db.getCollection("doctors");
+        doctors = db.getCollection("doctors2");
         administrators = db.getCollection("Administrator");
     }
 
@@ -588,17 +588,44 @@ public class MongoManager {
     //genera calendario dottore inserendo giorni da aggiungere e orari da aggiungere
     public void aggiungi_cal4(String username) throws IOException, ParseException {
         ArrayList<String> ore = new ArrayList<>();
-        System.out.println("insert how many hours do you want to add");
+
+        ArrayList<String> orari = new ArrayList<>();
+        orari.add("09:00");
+        orari.add("09:30");
+        orari.add("10:00");
+        orari.add("10:30");
+        orari.add("11:00");
+        orari.add("11:30");
+        orari.add("12:00");
+        orari.add("12:30");
+        orari.add("15:00");
+        orari.add("15:30");
+        orari.add("16:00");
+        orari.add("16:30");
+        orari.add("17:00");
+        orari.add("17:30");
+        orari.add("18:00");
+        orari.add("18:30");
+
+        System.out.println("How many time slots do you want to add?");
         int hour = keyboard.nextInt();
         for (int i = 0; i < hour; i++) {
-            System.out.println("insert the hour you want to add");
+
+            System.out.println("Enter the time slot you want to add as hh:mm: ");
             String orario = tastiera.readLine();
-            ore.add(orario);
+            /*
+            if (Arrays.asList(orari).contains(orario)) {
+                ore.add(orario);
+            } else {
+                System.out.println("Time slot not valid.");
+                break;
+            }*/
+
         }
 
-        System.out.println("Insert your date of birth nel formato yyyy-MM-dd");
+        System.out.println("Add the first date as yyyy-MM-dd:   ");
         String date = tastiera.readLine();
-        System.out.println("insert how many days you want add:");
+        System.out.println("How many days do you want to add?");
         int day = keyboard.nextInt();
 
         DateTime start = DateTime.parse(date);

@@ -88,9 +88,10 @@ public class Main {
                                             System.out.println("Please retry");
                                         } else {
                                             System.out.println("--DOCTOR--\nSelect a command: " +
-                                                    "\n1. [see reservations]" +
-                                                    "\n2. [insert dates and hour to your reservations]" +
-                                                    "\n3. [view my profile]" +
+                                                    "\n1. [SHOW RESERVATIONS]" +
+                                                    "\n2. [ADD DATES TO CALENDAR]" +
+                                                    "\n3. [SHOW MY PROFILE]" +
+                                                    "\n4. [SHOW REVIEWS]" +
 
                                                     "\n\n0. [Go back]");
                                             try {
@@ -107,15 +108,17 @@ public class Main {
                                                             break;
 
                                                         case "3":
-                                                            while (true) {
                                                                 //stampa le sue informazioni
                                                                 Methods.printMyProfile(usernameD);
-
-                                                                // TODO Cypher
-
-
                                                                 break;
+                                                        case"4":
+                                                            Doctor doctor2 = new Doctor(usernameD, "");
+                                                            ArrayList<Review> reviews = ndb.showReviews(doctor);
+                                                            for (int i = 0; i < reviews.size(); i++) {
+                                                                System.out.println("===================================================================================\n" +
+                                                                        "id_review:" + reviews.get(i).getId() + "\n" + reviews.get(i).getDateTime() + "\n" + reviews.get(i).getUsername() + "\nRating:" + reviews.get(i).getRating() + "\n" + reviews.get(i).getText());
                                                             }
+
                                                         case "0":
                                                             continue; //torna indietro alla pagina principale
                                                     }
@@ -169,7 +172,7 @@ public class Main {
                                     continue; //torna indietro alla pagina principale
 
                                 default:
-                                    System.out.println("insert a correct number: ");
+                                    System.out.println("Insert a correct number: ");
                                     continue;
                             }
                         } catch (Exception e) {
@@ -182,9 +185,9 @@ public class Main {
 
                         while (true) {
                             System.out.println("--USER--\nSelect a command: " +
-                                    "\n1. Login" +
-                                    "\n2. Sign up" +
-                                    "\n\n0. Go back");
+                                    "\n1. [LOGIN]" +
+                                    "\n2. [SIGN UP]" +
+                                    "\n\n0. [Go back]");
 
 
                             String option_user = tastiera.readLine();
@@ -206,35 +209,35 @@ public class Main {
 
                                                 System.out.println("***USER: " + username + "***" +
                                                         "\nSelect:" +
-                                                        "\n1 to find a doctor" +
-                                                        "\n2 to see all your reservations" +
-                                                        "\n0 to come back to the login page");
+                                                        "\n1. [FIND A DOCTOR]" +
+                                                        "\n2. [VIEW ALL YOUR RESERVATIONS]" +
+                                                        "\n0. [Go back]");
                                                 String com = tastiera.readLine();
 
                                                 switch (com) {
 
                                                     case "1":
 
-                                                        System.out.println("Select the city and the specialization you are interested to");
+                                                        System.out.println("Cities and specializations are displayed here, select:");
 
-                                                        System.out.println("CITIES CURRENTLY AVAIABLE:");
+                                                        System.out.println("CITIES CURRENTLY AVAILABLE:");
                                                         mdb.display_cities();
 
-                                                        System.out.println("\nSPECIALIZATIONS CURRENTLY AVAIABLE:");
+                                                        System.out.println("\nSPECIALIZATIONS CURRENTLY AVAILABLE:");
                                                         mdb.display_spec();
 
-                                                        System.out.println("Insert the city");
+                                                        System.out.println("Insert the city:");
                                                         String city = tastiera.readLine();
 
-                                                        System.out.println("Insert the specialization");
+                                                        System.out.println("Insert the specialization:");
                                                         String specialization = tastiera.readLine();
 
                                                         while (true) {
                                                             System.out.println("Choose the doctors by: (select a command)" +
-                                                                    "\n1. Show the entire list" +
-                                                                    "\n2. Most 3 cheapest doctors" +
-                                                                    "\n3. Doctors recommended by the system" +
-                                                                    "\n0. Go back");
+                                                                    "\n1. [SHOW THE ENTIRE LIST]" +
+                                                                    "\n2. [TOP 3 CHEAPEST DOCTORS]" +
+                                                                    "\n3. [DOCTORS RECOMMENDED BY THE SYSTEM]" +
+                                                                    "\n0. [Go back]");
 
                                                             String sort = tastiera.readLine();
 
@@ -268,8 +271,8 @@ public class Main {
 
 
                                                         while (true) {
-                                                            System.out.println("Select: \n1 if you want to book a medical examination with the doctor" +
-                                                                    "\n2. See all the doctor's reviews");
+                                                            System.out.println("Select: \n1. [BOOK A MEDICAL EXAMINATION]" +
+                                                                    "\n2. [SHOW DOCTOR'S REVIEW]");
 
 
                                                             String book = tastiera.readLine();
@@ -296,7 +299,7 @@ public class Main {
                                                                                 "id_review:" + reviews.get(i).getId() + "\n" + reviews.get(i).getDateTime() + "\n" + reviews.get(i).getUsername() + "\nRating:" + reviews.get(i).getRating() + "\n" + reviews.get(i).getText());
                                                                     }
 
-                                                                    System.out.println("Select 1 if you want to add a like to a review");
+                                                                    System.out.println("[TYPE 1 TO LIKE A REVIEW]");
                                                                     String like = tastiera.readLine();
 
                                                                     if (like.equals("1")) {
@@ -324,7 +327,7 @@ public class Main {
                                                         // mdb.showUserReservations(username);
                                                         Methods.printUserRes(username);
 
-                                                        System.out.println("Select 1 if you want to delete a reservation");
+                                                        System.out.println("TYPE 1 TO DELETE A RESERVATION");
                                                         int d = keyboard.nextInt();
                                                         if (d == 1) {
                                                             System.out.println("Select the examination's date");
@@ -426,7 +429,7 @@ public class Main {
 
                     case "3": //ADMINISTRATOR
                         System.out.println("--ADMINISTRATOR--\nWhat do you want to do? " +
-                                "\n1. [Login]" +
+                                "\n1. [LOGIN]" +
                                 "\n\n0. [Go back]");
 
                             String option_adm = tastiera.readLine();
@@ -451,14 +454,14 @@ public class Main {
 
                                             while (true) {
                                                 System.out.println("--ADMINISTRATOR--\nSelect a command: " +
-                                                        "\n1. add an administrator" +
-                                                        "\n2. add a doctor" +
-                                                        "\n3. add a user" +
-                                                        "\n4. delete a doctor" +
-                                                        "\n5. delete a user" +
-                                                        "\n6. show analytics" +
+                                                        "\n1. [ADD AN ADMINISTRATOR]" +
+                                                        "\n2. [ADD A DOCTOR]" +
+                                                        "\n3. [ADD A USER]" +
+                                                        "\n4. [DELETE A DOCTOR]" +
+                                                        "\n5. [DELETE A USER]" +
+                                                        "\n6. [SHOW ANALYTICS]" +
 
-                                                        "\n\n0. Go back");
+                                                        "\n\n0. [Go back]");
 
 
                                                 String option_administrator = tastiera.readLine();
@@ -474,7 +477,7 @@ public class Main {
                                                         if (!mdb.add_administrator(administratorAdd)) {
                                                             System.out.println("The username is already used. Please choose another one.");
                                                         } else {
-                                                            System.out.println("add successful!");
+                                                            System.out.println("ADDED SUCCESSFULLY!");
                                                             break;
                                                         }
                                                     case "2":
@@ -502,7 +505,7 @@ public class Main {
                                                         if (!mdb.add_doctor(doctor)) {
                                                             System.out.println("The username is already used. Please choose another one.");
                                                         } else {
-                                                            System.out.println("add successful!");
+                                                            System.out.println("ADDED SUCCESSFULLY");
                                                             break;
                                                         }
 
@@ -580,10 +583,10 @@ public class Main {
 
                                                     case "6":
                                                         System.out.println("--ADMINISTRATOR--\nSelect a command: " +
-                                                                "\n1. show cities with more registered users" +
-                                                                "\n2. show the most expensive specialization" +
-                                                                "\n3. most active reviewers" +
-                                                                "\n4. best reviewers" +
+                                                                "\n1. [SHOW CITIES WITH MORE USERS]" +
+                                                                "\n2. [SHOW MOST EXPENSIVE SPECIALIZATIONS]" +
+                                                                "\n3. [SHOW ACTIVE REVIEWERS]" +
+                                                                "\n4. [SHOW BEST REVIEWERS]" +
                                                                 "\n\n0. Go back");
                                                         String analytics_adm = tastiera.readLine();
 

@@ -142,7 +142,6 @@ public class Neo4jManager implements AutoCloseable {
 
                 return null;
             });
-         //   System.out.println(movieTitles);
         }
         return reviewList;
     }
