@@ -49,11 +49,11 @@ public class Neo4jManager implements AutoCloseable {
         try ( Session session = driver.session() )
         {
             String username = user.getUsername();
-            int age = user.getAge();
+
 
             session.writeTransaction((TransactionWork<Void>) tx -> {
-                tx.run( "MERGE (u:User {username: $username, age: $age})",
-                        parameters( "username", username, "age",age ) );
+                tx.run( "MERGE (u:User {username: $username})",
+                        parameters( "username", username ) );
                 return null;
             });
         }
@@ -121,12 +121,12 @@ public class Neo4jManager implements AutoCloseable {
 
         try ( Session session = driver.session() )
         {
-            String docname = doctor.getName();
+            String doc_id = doctor.getUsername();
             ArrayList<Review> reviews = session.readTransaction((TransactionWork<ArrayList<Review>>) tx -> {
                         Result result = tx.run( "MATCH (u:User)-[:WRITES]->(r:Review)-[:BELONGSTO]->(d:Doctors)" +
-                                        " WHERE d.docname = $docname" +
-                                        " RETURN r.review as id, u.username as username,  r.text as text, r.rating as rating, r.data as date",
-                                parameters( "docname", docname) );
+                                        " WHERE d.doc_id = $doc_id" +
+                                        " RETURN r.review_id as id, u.username as username,  r.text as text, r.rating as rating, r.data as date",
+                                parameters( "doc_id", doc_id) );
                         while(result.hasNext())
                         {
                             Record r = result.next();

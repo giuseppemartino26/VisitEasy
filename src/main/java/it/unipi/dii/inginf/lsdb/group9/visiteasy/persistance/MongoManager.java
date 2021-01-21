@@ -51,9 +51,9 @@ public class MongoManager {
 
     public MongoManager()
     {
-        mongoClient = MongoClients.create("mongodb://172.16.3.109:27020,172.16.3.110:27020,172.16.3.111:27020/" +
-                "?retryWrites=true&w=majority&wtimeout=10000");
-      //  mongoClient = MongoClients.create();
+       // mongoClient = MongoClients.create("mongodb://172.16.3.109:27020,172.16.3.110:27020,172.16.3.111:27020/" +
+        //        "?retryWrites=true&w=majority&wtimeout=10000");
+        mongoClient = MongoClients.create();
         db = mongoClient.getDatabase("progetto");
         users = db.getCollection("users");
         doctors = db.getCollection("doctors");
@@ -96,7 +96,7 @@ public class MongoManager {
     public boolean add_user(User user)
     {
         if (users.countDocuments(new Document("username", user.getUsername())) == 0) {
-            Document doc = new Document("username", user.getUsername()).append("password", user.getPassword()).append("age", user.getAge());
+            Document doc = new Document("username", user.getUsername()).append("password", user.getPassword()).append("city", user.getCity());
             users.insertOne(doc);
             return true;
         } else return false;
@@ -586,7 +586,7 @@ public class MongoManager {
     }
 
     //genera calendario dottore inserendo giorni da aggiungere e orari da aggiungere
-    void aggiungi_cal4(String username) throws IOException, ParseException {
+    public void aggiungi_cal4(String username) throws IOException, ParseException {
         ArrayList<String> ore = new ArrayList<>();
         System.out.println("insert how many hours do you want to add");
         int hour = keyboard.nextInt();
@@ -695,7 +695,7 @@ double age= result.getDouble("")
 
 
     //Analytics 3 most expensive specializations
-    void printMostExpSpec() {
+    public void printMostExpSpec() {
 
         Bson group1 = new Document("$group", new Document("_id", new Document("specialization", "$specialization"))
                 .append("AvgPrice", new Document("$avg", "$price")));
@@ -721,7 +721,7 @@ double age= result.getDouble("")
 
 // mostra la città in cui ci sono più utenti
 
-    void printmostcity() {
+    public void printmostcity() {
 
 
 

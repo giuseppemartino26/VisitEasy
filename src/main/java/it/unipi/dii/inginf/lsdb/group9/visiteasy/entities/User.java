@@ -21,11 +21,6 @@ public class User {
         this.password = password;
     }
 
-    public User(String username, int age)
-    {
-        this.username = username;
-        this.age = age;
-    }
 
     public User(String username, String password, String city)
     {

@@ -70,13 +70,13 @@ public class Main {
                         ndb.addReview(review);
                         System.out.println("FATTO");*/
 
-                     /*   Doctor doctor26 = new Doctor("Dott. Cosmo Godino");
+                        Doctor doctor26 = new Doctor("Dott. Cosmo Godino");
                         ArrayList<Review> lista = ndb.showReviews(doctor26);
 
                         for (int i = 0; i < lista.size(); i++){
                             System.out.println("===================================================================================\n" +
                                     "id_review:"+lista.get(i).getId()+"\n"+lista.get(i).getDateTime()+"\n"+lista.get(i).getUsername()+"\nRating:"+lista.get(i).getRating()+"\n"+lista.get(i).getText());
-                        }*/
+                        }
 
                        /* User user266 = new User("giusepppe","martino");
                         Review review = new Review("gm26", DateTime.now().toString(),"dottinesistente","giuseppemartino26",4,"Recensione prova");
@@ -90,7 +90,10 @@ public class Main {
 
                         //   System.out.println(mdb.getDocName("5fe8ade83a65753d7c4b4667"));
 
-                        Methods.printUserRes("giuseppe");
+                      //  Methods.printUserRes("giuseppe");
+
+              //          User userprova = new User("giuseppe", "martino");
+              //          mdb.login_user(userprova);
 
                         System.out.println("fatto");
 
@@ -334,10 +337,15 @@ public class Main {
 
                                                             case "2":
                                                                 Doctor doctor = new Doctor(usernamedoc,"");
-                                                                ndb.showReviews(doctor);
+                                                               ArrayList<Review> reviews = ndb.showReviews(doctor);
+                                                                for (int i = 0; i < reviews.size(); i++){
+                                                                    System.out.println("===================================================================================\n" +
+                                                                            "id_review:"+reviews.get(i).getId()+"\n"+reviews.get(i).getDateTime()+"\n"+reviews.get(i).getUsername()+"\nRating:"+reviews.get(i).getRating()+"\n"+reviews.get(i).getText());
+                                                                }
 
                                                                 System.out.println("Select 1 if you want to add a like to a review");
                                                                 String like = tastiera.readLine();
+
                                                                 if (like.equals("1")){
                                                                     System.out.println("Insert the review_id:");
                                                                     String rid = tastiera.readLine();
@@ -408,7 +416,7 @@ public class Main {
 
                                 }
 
-                                case 2: //SignUp
+                                case "2": //SignUp
                                     while (true) {
 
                                         System.out.println("Insert the username");
@@ -454,16 +462,13 @@ public class Main {
                                     }
 
 
-                                        case 0:
+                                        case "0":
                                     continue; //torna indietro alla pagina principale
 
                                 default:
                                     System.out.println("insert a correct number");
                                     continue;
                             }
-                        }catch (Exception e) {
-                            System.out.println("ERROR: insert a correct number.");
-                            continue;
                         }
 
 
