@@ -8,6 +8,8 @@ public class Review {
     private String username;
     private int rating;
     private String text;
+    private int numLikes;
+
 
     public Review(String id, String dateTime, String username, int rating, String text)
     {
@@ -16,13 +18,27 @@ public class Review {
         this.username = username;
         this.rating = rating;
         this.text = text;
+
     }
 
-    public Review(String id, String dateTime, String docname, String username, int rating, String text)
+    public Review(String id, String dateTime, String username, int rating, String text,String docname)
     {
-        this(id,dateTime,username,rating,text);
+        this(id, dateTime, username, rating, text);
         this.docname = docname;
+
     }
+
+    public Review(String id, String dateTime, String username, int rating, String text,int numLikes)
+    {
+        this.id = id;
+        this.dateTime = dateTime;
+        this.username = username;
+        this.rating = rating;
+        this.text = text;
+        this.numLikes = numLikes;
+    }
+
+
 
     public Review(String id)
     {
@@ -51,5 +67,9 @@ public class Review {
 
     public String getUsername() {
         return username;
+    }
+
+    public int getNumLikes() {
+        return numLikes;
     }
 }

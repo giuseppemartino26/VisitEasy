@@ -103,8 +103,8 @@ public class Neo4jManager implements AutoCloseable {
 
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run( "MERGE (u:User{username: $username} )" +
-                                "MERGE (d:Doctors{docname: $docname})" +
-                                "CREATE (r:Review{rating: $rating,text: $text, review: $id, data: $date})" +
+                                "MERGE (d:Doctors{doc_id: $docname})" +
+                                "CREATE (r:Review{rating: $rating,text: $text, review_id: $id, data: $date})" +
                                 "CREATE (u)-[:WRITES]->(r)-[:BELONGSTO]->(d)",
                         parameters( "username", username,"docname",docname,"rating",rating,"text",text,"id",id,"date",dateTime ) );
                 return null;
@@ -115,33 +115,37 @@ public class Neo4jManager implements AutoCloseable {
     }
 
 
-    public ArrayList<Review> showReviews(Doctor doctor)
+
+    public ArrayList<Review> showReviews3(Doctor doctor)
     {
         ArrayList<Review> reviewList = new ArrayList<>();
 
         try ( Session session = driver.session() )
         {
-            String doc_id = doctor.getUsername();
+            String doctore = doctor.getUsername();
             ArrayList<Review> reviews = session.readTransaction((TransactionWork<ArrayList<Review>>) tx -> {
-                        Result result = tx.run( "MATCH (u:User)-[:WRITES]->(r:Review)-[:BELONGSTO]->(d:Doctors)" +
-                                        " WHERE d.doc_id = $doc_id" +
-                                        " RETURN r.review_id as id, u.username as username,  r.text as text, r.rating as rating, r.data as date",
-                                parameters( "doc_id", doc_id) );
-                        while(result.hasNext())
-                        {
-                            Record r = result.next();
-                            String id = r.get("id").asString();
-                           String username= r.get("username").asString();
-                           String text = r.get("text").asString();
-                           int rating = r.get("rating").asInt();
-                           String date = r.get("date").asString();
+                Result result = tx.run( "MATCH (u:User)-[:WRITES]->(r:Review)-[:BELONGSTO]->(d:Doctors) WHERE d.doc_id = $doctore WITH r.review_id as id, u.username as username,  r.text as text, r.rating as rating, r.data as date MATCH (r2:Review) WHERE r2.review_id = id RETURN id, username, text, rating, date, SIZE(()-[:LIKES]->(r2)) AS NumLikes",
+                        parameters( "doctore", doctore) );
 
-                           Review review = new Review(id,date,username,rating,text);
-                           reviewList.add(review);
-                        }
+
+                while(result.hasNext())
+                {
+                    Record r = result.next();
+                    String id = r.get("id").asString();
+                    String username= r.get("username").asString();
+                    String text = r.get("text").asString();
+                    int rating = r.get("rating").asInt();
+                    String date = r.get("date").asString();
+                    int numlikes = r.get("NumLikes").asInt();
+
+
+                    Review review = new Review(id,date,username,rating,text,numlikes);
+                    reviewList.add(review);
+                }
 
                 return null;
             });
+            //   System.out.println(movieTitles);
         }
         return reviewList;
     }
@@ -223,15 +227,16 @@ public class Neo4jManager implements AutoCloseable {
 
                 String query = "MATCH (r:Review)-[:BELONGSTO]->(d:Doctors)" +
                         " WHERE d.city = $city AND d.specialization= $specialization" +
-                        " WITH d.docname AS docname,avg(r.rating) AS AverageRating, count(r) AS NumReviews\n" +
-                        "RETURN docname, 5*AverageRating/10 + 5*(1-exp(-NumReviews/10)) AS score ORDER BY score DESC LIMIT 10";
+                        " WITH d.docname AS docname, d.doc_id AS us, avg(r.rating) AS AverageRating, count(r) AS NumReviews\n" +
+                        "RETURN docname, us, 5*AverageRating/10 + 5*(1-exp(-NumReviews/10)) AS score ORDER BY score DESC LIMIT 10";
                 Result result = tx.run(query,parameters("city",city,"specialization",specialization));
                 while(result.hasNext())
                 {
                     Record r = result.next();
                     String docname = r.get("docname").asString();
+                    String usernamedoc = r.get("us").asString();
                     double score = r.get("score").asDouble();
-                    System.out.println("\"" + docname + "\" with the score: " + score);
+                    System.out.println("\"" + docname + "\" with the score: " + score+"           us:"+usernamedoc);
                 }
                 return null;
             });
