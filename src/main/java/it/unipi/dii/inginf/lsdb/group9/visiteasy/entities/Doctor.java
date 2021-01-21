@@ -28,9 +28,21 @@ public class Doctor {
         this.password = password;
     }
 
+    public Doctor(String username, String password, String name) {
+        this(username, password);
+        this.name = name;
+    }
+
     public Doctor(String username, String password, int price) {
         this(username, password);
         this.price = price;
+    }
+
+    public Doctor(int price,String name, String username)
+    {
+        this.price = price;
+        this.name= name;
+        this.username = username;
     }
 
     public Doctor(String name, int price, String address, String bio)
@@ -40,6 +52,14 @@ public class Doctor {
         this.address = address;
         this.bio = bio;
 
+    }
+
+    public Doctor(String name, String specialization, String city, int price)
+    {
+        this.name = name;
+        this.specialization = specialization;
+        this.city = city;
+        this.price = price;
     }
 
 

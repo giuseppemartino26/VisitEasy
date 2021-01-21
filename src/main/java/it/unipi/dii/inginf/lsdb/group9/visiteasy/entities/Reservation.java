@@ -5,21 +5,29 @@ public class Reservation {
     private String docname;
     private String username;
     private String date;
+    private String docusername;
 
-    public Reservation(String docname, String date)
+    public Reservation(String docusername, String date)
     {
-        this.docname = docname;
+        this.docusername = docusername;
         this.date = date;
     }
 
-    public Reservation(String docname, String date, String username)
+    public Reservation(String docusername, String date, String username)
     {
-        this(docname,date);
+        this(docusername,date);
         this.username = username;
+    }
+
+    public Reservation(String docusername, String date, String username,String docname)
+    {
+        this(docusername, date, username);
+        this.docname = docname;
     }
 
     public String getDocname(){return docname;}
     public String getUsername(){return username;}
     public String getDate(){return date;}
+    public String getDocusername(){return docusername;}
 
 }
