@@ -609,19 +609,27 @@ public class MongoManager {
 
         System.out.println("How many time slots do you want to add?");
         int hour = keyboard.nextInt();
-        for (int i = 0; i < hour; i++) {
+        int i = 0;
+
+
+
+        do {
 
             System.out.println("Enter the time slot you want to add as hh:mm: ");
             String orario = tastiera.readLine();
-            /*
-            if (Arrays.asList(orari).contains(orario)) {
-                ore.add(orario);
-            } else {
-                System.out.println("Time slot not valid.");
-                break;
-            }*/
 
-        }
+
+                if (orari.contains(orario)) {
+                    ore.add(orario);
+                    i = i+1;
+
+                } else{
+                    System.out.println("Time slot not valid.");
+                }
+
+        } while (i<hour);
+
+
 
         System.out.println("Add the first date as yyyy-MM-dd:   ");
         String date = tastiera.readLine();
