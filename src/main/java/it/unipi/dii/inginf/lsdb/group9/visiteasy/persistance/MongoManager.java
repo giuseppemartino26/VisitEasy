@@ -54,10 +54,10 @@ public class MongoManager {
        // mongoClient = MongoClients.create("mongodb://172.16.3.109:27020,172.16.3.110:27020,172.16.3.111:27020/" +
         //        "?retryWrites=true&w=majority&wtimeout=10000");
         mongoClient = MongoClients.create();
-        db = mongoClient.getDatabase("progetto");
+        db = mongoClient.getDatabase("doctors");
         users = db.getCollection("users");
         doctors = db.getCollection("doctors");
-        administrators = db.getCollection("administrator");
+        administrators = db.getCollection("Administrator");
     }
 
     public MongoClient getMongoClient(){return mongoClient;}
@@ -267,14 +267,14 @@ public class MongoManager {
     //DELETE DOCTOR
     public boolean delete_doctor_by_the_administrator(Doctor doctor)
     {
-        Document result = users.find(eq("username", doctor.getUsername())).first();
+        Document result = doctors.find(eq("username", doctor.getUsername())).first();
         try {
             result.getString("username");
         } catch (NullPointerException exception) {
             System.out.println("The username does not exist");
             return false;
         }
-        users.deleteOne(eq("username", doctor.getUsername()));
+        doctors.deleteOne(eq("username", doctor.getUsername()));
         return true;
     }
 

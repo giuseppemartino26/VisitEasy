@@ -59,107 +59,68 @@ public class Main {
                     "\n3. ADMINISTRATOR ");
 
             try {
-                int option = keyboard.nextInt();
+                String option = tastiera.readLine();
 
 
                 switch (option) {
 
-
-                    case 9:
-                     /*   Review review = new Review("gm26", DateTime.now().toString(),"dottinesistente","giuseppemartino26",4,"Recensione prova");
-                        ndb.addReview(review);
-                        System.out.println("FATTO");*/
-
-                        Doctor doctor26 = new Doctor("Dott. Cosmo Godino");
-                        ArrayList<Review> lista = ndb.showReviews(doctor26);
-
-                        for (int i = 0; i < lista.size(); i++){
-                            System.out.println("===================================================================================\n" +
-                                    "id_review:"+lista.get(i).getId()+"\n"+lista.get(i).getDateTime()+"\n"+lista.get(i).getUsername()+"\nRating:"+lista.get(i).getRating()+"\n"+lista.get(i).getText());
-                        }
-
-                       /* User user266 = new User("giusepppe","martino");
-                        Review review = new Review("gm26", DateTime.now().toString(),"dottinesistente","giuseppemartino26",4,"Recensione prova");
-                        ndb.like(user266,review);*/
-
-                        //  ndb.recommendedDoctors("Torino","Nutritionist");
-
-
-                   /*     Reservation reservation26 = new Reservation("5fe8ade83a65753d7c4b4667","16/01/21 09:30","giuseppe");
-                        mdb.book(reservation26);*/
-
-                        //   System.out.println(mdb.getDocName("5fe8ade83a65753d7c4b4667"));
-
-                      //  Methods.printUserRes("giuseppe");
-
-              //          User userprova = new User("giuseppe", "martino");
-              //          mdb.login_user(userprova);
-
-                        System.out.println("fatto");
-
-
-                        return;
-
-
-                    case 1:
+                    case "1":
 
                         System.out.println("--DOCTOR--\nWhat do you want to do? " +
                                 "\n1. [Login]" +
                                 "\n2. [Sign up]" +
                                 "\n\n0. [Go back]");
 
-                        try{
-                            int option_doctor = keyboard.nextInt();
+                        try {
+                            String option_doctor = tastiera.readLine();
 
-                            switch (option_doctor)
-                            {
-                                case 1: //LOGIN
+                            switch (option_doctor) {
+                                case "1": //LOGIN
 
-                                    while (true)
-                                    {
+                                    while (true) {
                                         System.out.println("--LOGIN DOCTOR--\nEnter your username: ");
                                         String usernameD = tastiera.readLine();
                                         System.out.println("Enter password: ");
                                         String passwordD = tastiera.readLine();
 
-                                        Doctor doctor = new Doctor(usernameD,passwordD);
-                                        if (!mdb.login_doctor(doctor)){
+                                        Doctor doctor = new Doctor(usernameD, passwordD);
+                                        if (!mdb.login_doctor(doctor)) {
                                             System.out.println("Please retry");
-                                        }else {
+                                        } else {
                                             System.out.println("--DOCTOR--\nSelect a command: " +
                                                     "\n1. [see reservations]" +
                                                     "\n2. [insert dates and hour to your reservations]" +
-                                                    "\n3. [view my profile]"+
+                                                    "\n3. [view my profile]" +
 
                                                     "\n\n0. [Go back]");
-                                            try{
-                                                while (true){
-                                                int option_doctor2 = keyboard.nextInt();
-                                                switch (option_doctor2){
-                                                    case 1:
-                                                        //see doctor's reservations
-                                                        mdb.showreservations(usernameD);
-                                                        break;
-                                                    case 2:
-                                                        // a new doctor create the reservations
-                                                        mdb.aggiungi_cal4(usernameD);
-                                                        break;
-
-                                                    case 3:
-                                                        while (true) {
-                                                            //stampa le sue informazioni
-                                                            Methods.printMyProfile(usernameD);
-
-                                                            // TODO Cypher
-
-
+                                            try {
+                                                while (true) {
+                                                    String option_doctor2 = tastiera.readLine();
+                                                    switch (option_doctor2) {
+                                                        case "1":
+                                                            //see doctor's reservations
+                                                            mdb.showreservations(usernameD);
                                                             break;
-                                                        }
-                                                    case 0:
-                                                        continue; //torna indietro alla pagina principale
-                                                }}
-                                            }
-                                            catch (Exception e){
+                                                        case "2":
+                                                            // a new doctor create the reservations
+                                                            mdb.aggiungi_cal4(usernameD);
+                                                            break;
+
+                                                        case "3":
+                                                            while (true) {
+                                                                //stampa le sue informazioni
+                                                                Methods.printMyProfile(usernameD);
+
+                                                                // TODO Cypher
+
+
+                                                                break;
+                                                            }
+                                                        case "0":
+                                                            continue; //torna indietro alla pagina principale
+                                                    }
+                                                }
+                                            } catch (Exception e) {
                                                 System.out.println("ERROR: enter a correct number.");
                                                 continue;
                                             }
@@ -169,13 +130,12 @@ public class Main {
 
                                     }
 
-                                case 2: //SignUp
-                                    while (true)
-                                    {
+                                case "2": //SignUp
+                                    while (true) {
 
                                         Scanner scan = new Scanner(System.in);
                                         System.out.println("Insert the username: ");
-                                        String username =  tastiera.readLine();
+                                        String username = tastiera.readLine();
                                         System.out.println("Insert the password: ");
                                         String password = tastiera.readLine();
                                         System.out.println("Insert your name: ");
@@ -189,7 +149,7 @@ public class Main {
                                         System.out.println("Insert your address: ");
                                         String address = tastiera.readLine();
                                         System.out.println("Insert price for your visit: ");
-                                        while(!scan.hasNextInt()) {
+                                        while (!scan.hasNextInt()) {
                                             System.out.println("Please enter a number: ");
                                             scan.nextLine();
                                         }
@@ -205,216 +165,208 @@ public class Main {
                                     }
 
 
-                                case 0:
+                                case "0":
                                     continue; //torna indietro alla pagina principale
 
                                 default:
                                     System.out.println("insert a correct number: ");
                                     continue;
                             }
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             System.out.println("ERROR: insert a correct number.");
                             continue;
                         }
 
 
-                    case 2:
+                    case "2":
 
-                    while (true)
-                   {
-                        System.out.println("--USER--\nSelect a command: " +
-                                "\n1. Login" +
-                                "\n2. Sign up" +
-                                "\n\n0. Go back");
-
-
-                       String option_user = tastiera.readLine();
-
-                        switch (option_user)
-                        {
-                            case "1": //LOGIN USER
-                                while (true)
-                                {
-                                    System.out.println("--LOGIN USER--\nInsert the username");
-                                    String username = tastiera.readLine();
-                                    System.out.println("Insert the password");
-                                    String password = tastiera.readLine();
-
-                                    User user = new User(username, password);
-                                    if (!mdb.login_user(user)) {
-                                        System.out.println("Please retry");
-                                    } else
-                                        {
-
-                                        while (true)
-                                        {
-
-                                            System.out.println("***USER: " + username + "***" +
-                                                    "\nSelect:" +
-                                                    "\n1 to find a doctor" +
-                                                    "\n2 to see all your reservations" +
-                                                    "\n0 to come back to the login page");
-                                            String com = tastiera.readLine();
-
-                                            switch (com) {
-
-                                                case "1":
-
-                                                    System.out.println("Select the city and the specialization you are interested to");
-
-                                                    System.out.println("CITIES CURRENTLY AVAIABLE:");
-                                                    mdb.display_cities();
-
-                                                    System.out.println("\nSPECIALIZATIONS CURRENTLY AVAIABLE:");
-                                                    mdb.display_spec();
-
-                                                    System.out.println("Insert the city");
-                                                    String city = tastiera.readLine();
-
-                                                    System.out.println("Insert the specialization");
-                                                    String specialization = tastiera.readLine();
-
-                                                    while (true) {
-                                                        System.out.println("Choose the doctors by: (select a command)" +
-                                                                "\n1. Show the entire list" +
-                                                                "\n2. Most 3 cheapest doctors" +
-                                                                "\n3. Doctors recommended by the system" +
-                                                                "\n0. Go back");
-
-                                                        String sort = tastiera.readLine();
+                        while (true) {
+                            System.out.println("--USER--\nSelect a command: " +
+                                    "\n1. Login" +
+                                    "\n2. Sign up" +
+                                    "\n\n0. Go back");
 
 
-                                                        switch (sort) {
-                                                            case "1":
-                                                                 Methods.printAllDocList(city, specialization);
-                                                                break;
+                            String option_user = tastiera.readLine();
 
-                                                            case "2":
-                                                                Methods.printCheapestDocList(city, specialization);
-                                                                break;
+                            switch (option_user) {
+                                case "1": //LOGIN USER
+                                    while (true) {
+                                        System.out.println("--LOGIN USER--\nInsert the username");
+                                        String username = tastiera.readLine();
+                                        System.out.println("Insert the password");
+                                        String password = tastiera.readLine();
 
-                                                            case "3":
-                                                                ndb.recommendedDoctors(city, specialization);
+                                        User user = new User(username, password);
+                                        if (!mdb.login_user(user)) {
+                                            System.out.println("Please retry");
+                                        } else {
 
-                                                            case "0":
-                                                                break;
+                                            while (true) {
 
-                                                            default:
-                                                                System.out.println("Please, select a correct command");
-                                                                continue;
-                                                        }
-                                                        break;
-                                                    }
-                                                    System.out.println("Enter the username of the doctor you want to see:");
+                                                System.out.println("***USER: " + username + "***" +
+                                                        "\nSelect:" +
+                                                        "\n1 to find a doctor" +
+                                                        "\n2 to see all your reservations" +
+                                                        "\n0 to come back to the login page");
+                                                String com = tastiera.readLine();
 
-                                                    String usernamedoc = tastiera.readLine();
+                                                switch (com) {
 
-                                                    Methods.printMyProfile(usernamedoc);
+                                                    case "1":
+
+                                                        System.out.println("Select the city and the specialization you are interested to");
+
+                                                        System.out.println("CITIES CURRENTLY AVAIABLE:");
+                                                        mdb.display_cities();
+
+                                                        System.out.println("\nSPECIALIZATIONS CURRENTLY AVAIABLE:");
+                                                        mdb.display_spec();
+
+                                                        System.out.println("Insert the city");
+                                                        String city = tastiera.readLine();
+
+                                                        System.out.println("Insert the specialization");
+                                                        String specialization = tastiera.readLine();
+
+                                                        while (true) {
+                                                            System.out.println("Choose the doctors by: (select a command)" +
+                                                                    "\n1. Show the entire list" +
+                                                                    "\n2. Most 3 cheapest doctors" +
+                                                                    "\n3. Doctors recommended by the system" +
+                                                                    "\n0. Go back");
+
+                                                            String sort = tastiera.readLine();
 
 
-                                                    while (true)
-                                                    {
-                                                        System.out.println("Select: \n1 if you want to book a medical examination with the doctor" +
-                                                                                   "\n2. See all the doctor's reviews");
+                                                            switch (sort) {
+                                                                case "1":
+                                                                    Methods.printAllDocList(city, specialization);
+                                                                    break;
 
+                                                                case "2":
+                                                                    Methods.printCheapestDocList(city, specialization);
+                                                                    break;
 
-                                                        String book = tastiera.readLine();
+                                                                case "3":
+                                                                    ndb.recommendedDoctors(city, specialization);
 
-                                                        switch (book)
-                                                        {
-                                                            case "1":
+                                                                case "0":
+                                                                    break;
 
-                                                            Methods.printSlots(usernamedoc);
-
-                                                            System.out.println("Insert the data of the medical examination you want to book");
-
-                                                            String date1 = tastiera.readLine();
-                                                            String docname = mdb.getDocName(usernamedoc);
-                                                            Reservation reservation = new Reservation(usernamedoc, date1, user.getUsername(), docname);
-
-                                                            mdb.book(reservation);
+                                                                default:
+                                                                    System.out.println("Please, select a correct command");
+                                                                    continue;
+                                                            }
                                                             break;
+                                                        }
+                                                        System.out.println("Enter the username of the doctor you want to see:");
 
-                                                            case "2":
-                                                                Doctor doctor = new Doctor(usernamedoc,"");
-                                                               ArrayList<Review> reviews = ndb.showReviews(doctor);
-                                                                for (int i = 0; i < reviews.size(); i++){
-                                                                    System.out.println("===================================================================================\n" +
-                                                                            "id_review:"+reviews.get(i).getId()+"\n"+reviews.get(i).getDateTime()+"\n"+reviews.get(i).getUsername()+"\nRating:"+reviews.get(i).getRating()+"\n"+reviews.get(i).getText());
-                                                                }
+                                                        String usernamedoc = tastiera.readLine();
 
-                                                                System.out.println("Select 1 if you want to add a like to a review");
-                                                                String like = tastiera.readLine();
+                                                        Methods.printMyProfile(usernamedoc);
 
-                                                                if (like.equals("1")){
-                                                                    System.out.println("Insert the review_id:");
-                                                                    String rid = tastiera.readLine();
-                                                                    User user1 = new User(user.getUsername());
-                                                                    Review review = new Review(rid);
-                                                                    ndb.like(user1,review);
+
+                                                        while (true) {
+                                                            System.out.println("Select: \n1 if you want to book a medical examination with the doctor" +
+                                                                    "\n2. See all the doctor's reviews");
+
+
+                                                            String book = tastiera.readLine();
+
+                                                            switch (book) {
+                                                                case "1":
+
+                                                                    Methods.printSlots(usernamedoc);
+
+                                                                    System.out.println("Insert the data of the medical examination you want to book");
+
+                                                                    String date1 = tastiera.readLine();
+                                                                    String docname = mdb.getDocName(usernamedoc);
+                                                                    Reservation reservation = new Reservation(usernamedoc, date1, user.getUsername(), docname);
+
+                                                                    mdb.book(reservation);
                                                                     break;
-                                                                }else {
-                                                                    break;
-                                                                }
+
+                                                                case "2":
+                                                                    Doctor doctor = new Doctor(usernamedoc, "");
+                                                                    ArrayList<Review> reviews = ndb.showReviews(doctor);
+                                                                    for (int i = 0; i < reviews.size(); i++) {
+                                                                        System.out.println("===================================================================================\n" +
+                                                                                "id_review:" + reviews.get(i).getId() + "\n" + reviews.get(i).getDateTime() + "\n" + reviews.get(i).getUsername() + "\nRating:" + reviews.get(i).getRating() + "\n" + reviews.get(i).getText());
+                                                                    }
+
+                                                                    System.out.println("Select 1 if you want to add a like to a review");
+                                                                    String like = tastiera.readLine();
+
+                                                                    if (like.equals("1")) {
+                                                                        System.out.println("Insert the review_id:");
+                                                                        String rid = tastiera.readLine();
+                                                                        User user1 = new User(user.getUsername());
+                                                                        Review review = new Review(rid);
+                                                                        ndb.like(user1, review);
+                                                                        break;
+                                                                    } else {
+                                                                        break;
+                                                                    }
 
 
+                                                                default:
+                                                                    System.out.println("ERROR:Insert a correct number");
 
-                                                            default:
-                                                                System.out.println("ERROR:Insert a correct number");
+
+                                                            }
 
 
                                                         }
 
+                                                    case "2":
+                                                        // mdb.showUserReservations(username);
+                                                        Methods.printUserRes(username);
 
-                                                     }
+                                                        System.out.println("Select 1 if you want to delete a reservation");
+                                                        int d = keyboard.nextInt();
+                                                        if (d == 1) {
+                                                            System.out.println("Select the examination's date");
+                                                            InputStreamReader dat = new InputStreamReader(System.in);
+                                                            BufferedReader tastdat = new BufferedReader(dat);
 
-                                                case "2":
-                                                    // mdb.showUserReservations(username);
-                                                    Methods.printUserRes(username);
+                                                            String date = null;
+                                                            try {
+                                                                date = tastdat.readLine();
+                                                            } catch (Exception e) {
+                                                            }
 
-                                                    System.out.println("Select 1 if you want to delete a reservation");
-                                                    int d = keyboard.nextInt();
-                                                    if (d == 1) {
-                                                        System.out.println("Select the examination's date");
-                                                        InputStreamReader dat = new InputStreamReader(System.in);
-                                                        BufferedReader tastdat = new BufferedReader(dat);
+                                                            System.out.println("Write the doctor's name:");
+                                                            InputStreamReader inp = new InputStreamReader(System.in);
+                                                            BufferedReader tast = new BufferedReader(inp);
 
-                                                        String date = null;
-                                                        try {
-                                                            date = tastdat.readLine();
-                                                        } catch (Exception e) {
+                                                            String docname = null;
+                                                            try {
+                                                                docname = tast.readLine();
+                                                            } catch (Exception e) {
+                                                            }
+
+                                                            Reservation reservation = new Reservation(docname, date, username);
+
+                                                            mdb.freeSlot(reservation);
                                                         }
 
-                                                        System.out.println("Write the doctor's name:");
-                                                        InputStreamReader inp = new InputStreamReader(System.in);
-                                                        BufferedReader tast = new BufferedReader(inp);
 
-                                                        String docname = null;
-                                                        try {
-                                                            docname = tast.readLine();
-                                                        } catch (Exception e) {
-                                                        }
+                                                    case "0":
+                                                        break;
 
-                                                        Reservation reservation = new Reservation(docname, date, username);
+                                                    default:
+                                                        System.out.println("INCORRECT COMMAND. Please retry");
 
-                                                        mdb.freeSlot(reservation);
-                                                    }
-
-
-                                                case "0":
-                                                    break;
-
-                                                default:
-                                                    System.out.println("INCORRECT COMMAND. Please retry");
+                                                }
 
                                             }
 
+
                                         }
 
-
-                                         }
-
-                                }
+                                    }
 
                                 case "2": //SignUp
                                     while (true) {
@@ -462,7 +414,7 @@ public class Main {
                                     }
 
 
-                                        case "0":
+                                case "0":
                                     continue; //torna indietro alla pagina principale
 
                                 default:
@@ -472,88 +424,98 @@ public class Main {
                         }
 
 
-                    case 3: //ADMINISTRATOR
-                        while(true) {
-                            System.out.println("--LOGIN ADMINISTRATOR--\nInsert the username");
-                            String username = keyboard.next();
-                            System.out.println("Insert the password");
-                            String password = keyboard.next();
-                            Administrator administrator = new Administrator(username,password);
-                            if (!mdb.login_administrator(administrator)){
-                                System.out.println("Please retry");
-                            }else {
+                    case "3": //ADMINISTRATOR
+                        System.out.println("--ADMINISTRATOR--\nWhat do you want to do? " +
+                                "\n1. [Login]" +
+                                "\n\n0. [Go back]");
 
-                                System.out.println("Select what do you want do:");
+                            String option_adm = tastiera.readLine();
+
+                            switch (option_adm) {
 
 
-                                System.out.println("--ADMINISTRATOR--\nSelect a command: " +
-                                        "\n1. add an administrator" +
-                                        "\n2. add a doctor" +
-                                        "\n3. add a user" +
-                                        "\n4. delete a doctor" +
-                                        "\n5. delete a user" +
-                                        "\n6. show analytics" +
-
-                                        "\n\n0. Go back");
-                            }
-                            try{
-                                int option_administrator = keyboard.nextInt();
-
-                                switch (option_administrator)
-                                {
-                                    case 1:
-                                        //add an administrator
-                                        System.out.println("Insert the username");
-                                        String administratorUsername = keyboard.next();
+                                case "1":
+                                    while (true) {
+                                        System.out.println("--LOGIN ADMINISTRATOR--\nInsert the username");
+                                        String username = tastiera.readLine();
                                         System.out.println("Insert the password");
-                                        String administratorPassword = keyboard.next();
-                                        Administrator administratorAdd= new Administrator(administratorUsername, administratorPassword);
-                                        if (!mdb.add_administrator(administratorAdd)) {
-                                            System.out.println("The username is already used. Please choose another one.");
+                                        String password = tastiera.readLine();
+                                        Administrator administrator = new Administrator(username, password);
+                                        if (!mdb.login_administrator(administrator)) {
+                                            System.out.println("Please retry");
+
+
                                         } else {
-                                            System.out.println("add successful!");
-                                            break;
-                                        }
-                                    case 2:
-                                        //add a doctor
 
-                                        System.out.println("Insert the username");
-                                        String usernameD = keyboard.next();
-                                        System.out.println("Insert the password");
-                                        String passwordD = keyboard.next();
-                                        System.out.println("Insert the name");
-                                        String name = tastiera.readLine();
-                                        System.out.println("Insert the city");
-                                        String city = tastiera.readLine();
-                                        System.out.println("Insert a short bio");
-                                        String bio = tastiera.readLine();
-                                        System.out.println("Insert the specialization");
-                                        String specialization = keyboard.next();
-                                        System.out.println("Insert the address");
-                                        String address = tastiera.readLine();
-                                        System.out.println("Insert the price for the visit");
-                                        int price = keyboard.nextInt();
+                                            System.out.println("Select what do you want do:");
 
-                                        Doctor doctor = new Doctor(usernameD, passwordD, price, name, city, specialization, bio, address);
+                                            while (true) {
+                                                System.out.println("--ADMINISTRATOR--\nSelect a command: " +
+                                                        "\n1. add an administrator" +
+                                                        "\n2. add a doctor" +
+                                                        "\n3. add a user" +
+                                                        "\n4. delete a doctor" +
+                                                        "\n5. delete a user" +
+                                                        "\n6. show analytics" +
 
-                                        if (!mdb.add_doctor(doctor)) {
-                                            System.out.println("The username is already used. Please choose another one.");
-                                        } else {
-                                            System.out.println("add successful!");
-                                            break;
-                                        }
+                                                        "\n\n0. Go back");
 
-                                    case 3:
-                                        //add a user
-                                        while (true)
-                                        {
 
-                                            System.out.println("Insert the username");
-                                            String usernameN = tastiera.readLine();
-                                            System.out.println("Insert the password");
-                                            String passwordN = tastiera.readLine();
-                                            System.out.println("Insert city");
-                                            String cityN = tastiera.readLine();
+                                                String option_administrator = tastiera.readLine();
+
+                                                switch (option_administrator) {
+                                                    case "1":
+                                                        //add an administrator
+                                                        System.out.println("Insert the username");
+                                                        String administratorUsername = tastiera.readLine();
+                                                        System.out.println("Insert the password");
+                                                        String administratorPassword = tastiera.readLine();
+                                                        Administrator administratorAdd = new Administrator(administratorUsername, administratorPassword);
+                                                        if (!mdb.add_administrator(administratorAdd)) {
+                                                            System.out.println("The username is already used. Please choose another one.");
+                                                        } else {
+                                                            System.out.println("add successful!");
+                                                            break;
+                                                        }
+                                                    case "2":
+                                                        //add a doctor
+
+                                                        System.out.println("Insert the username");
+                                                        String usernameD = tastiera.readLine();
+                                                        System.out.println("Insert the password");
+                                                        String passwordD = tastiera.readLine();
+                                                        System.out.println("Insert the name");
+                                                        String name = tastiera.readLine();
+                                                        System.out.println("Insert the city");
+                                                        String city = tastiera.readLine();
+                                                        System.out.println("Insert a short bio");
+                                                        String bio = tastiera.readLine();
+                                                        System.out.println("Insert the specialization");
+                                                        String specialization = tastiera.readLine();
+                                                        System.out.println("Insert the address");
+                                                        String address = tastiera.readLine();
+                                                        System.out.println("Insert the price for the visit");
+                                                        int price = keyboard.nextInt();
+
+                                                        Doctor doctor = new Doctor(usernameD, passwordD, price, name, city, specialization, bio, address);
+
+                                                        if (!mdb.add_doctor(doctor)) {
+                                                            System.out.println("The username is already used. Please choose another one.");
+                                                        } else {
+                                                            System.out.println("add successful!");
+                                                            break;
+                                                        }
+
+                                                    case "3":
+                                                        //add a user
+
+
+                                                            System.out.println("Insert the username");
+                                                            String usernameN = tastiera.readLine();
+                                                            System.out.println("Insert the password");
+                                                            String passwordN = tastiera.readLine();
+                                                            System.out.println("Insert city");
+                                                            String cityN = tastiera.readLine();
 
                                            /* Date dateofBirth = null;
 
@@ -577,87 +539,108 @@ public class Main {
                                             }
 */
 
-                                            User user = new User(usernameN, passwordN, cityN);
+                                                            User user = new User(usernameN, passwordN, cityN);
 
-                                            if (!mdb.add_user(user)) {
-                                                System.out.println("The username is already used. Please choose another one.");
-                                            } else {
-                                                System.out.println("add successful!");
-                                                break;
+                                                            if (!mdb.add_user(user)) {
+                                                                System.out.println("The username is already used. Please choose another one.");
+                                                            } else {
+                                                                System.out.println("add successful!");
+                                                                break;
+                                                            }break;
+
+                                                    case "4":
+                                                        //delete a doctor
+                                                        System.out.println("Insert the username of the doctor you want to delete");
+                                                        String usernameDeleteDoc = tastiera.readLine();
+                                                        String passwordDeleteDoc = "ok";
+
+                                                        Doctor doctorDelete = new Doctor(usernameDeleteDoc, passwordDeleteDoc);
+                                                        if (!mdb.delete_doctor_by_the_administrator(doctorDelete)) {
+                                                            System.out.println(" username not found. Please choose another one.");
+                                                        } else {
+                                                            System.out.println("doctor deleted successfully!");
+                                                            break;
+                                                        }
+                                                        break;
+
+                                                    case "5":
+                                                        //delete a user
+                                                        System.out.println("Insert the username of the user you want to delete");
+                                                        String usernameDelete = tastiera.readLine();
+
+
+                                                        User userDelete = new User(usernameDelete);
+                                                        if (!mdb.delete_user_by_the_administrator(userDelete)) {
+                                                            System.out.println(" username not found. Please choose another one.");
+                                                        } else {
+                                                            System.out.println("user deleted successful!");
+                                                            break;
+                                                        }
+                                                        break;
+
+                                                    case "6":
+                                                        System.out.println("--ADMINISTRATOR--\nSelect a command: " +
+                                                                "\n1. show cities with more registered users" +
+                                                                "\n2. show the most expensive specialization" +
+                                                                "\n3. most active reviewers" +
+                                                                "\n4. best reviewers" +
+                                                                "\n\n0. Go back");
+                                                        String analytics_adm = tastiera.readLine();
+
+                                                        switch (analytics_adm) {
+                                                            case "1":
+                                                                mdb.printmostcity();
+                                                                // mdb.printAvgUsers();
+                                                                break;
+                                                            case "2":
+                                                                mdb.printMostExpSpec();
+                                                                break;
+                                                            case "3":
+                                                                ndb.printActiveReviewers();
+                                                                break;
+                                                            case "4":
+                                                                ndb.printBestReviewers();
+                                                                break;
+                                                            case "0":
+                                                                System.out.println("return to the menu");
+                                                                break;
+                                                            default:
+                                                                System.out.println("INCORRECT COMMAND. Please retry");
+                                                        }
+
+
+                                                    case "0":
+                                                        //go back
+
+                                                        break;
+
+                                                    default:
+                                                        System.out.println("INCORRECT COMMAND. Please retry");
+                                                }
+
+
                                             }
                                         }
-                                    case 4:
-                                        //delete a doctor
-                                        System.out.println("Insert the username you want to delete");
-                                        String usernameDeleteDoc = keyboard.next();
-                                        String passwordDeleteDoc = "ok";
 
-                                        Doctor doctorDelete = new Doctor(usernameDeleteDoc, passwordDeleteDoc);
-                                        if (!mdb.delete_doctor_by_the_administrator(doctorDelete)) {
-                                            System.out.println(" username not found. Please choose another one.");
-                                        } else {
-                                            System.out.println("username deleted successfully!");
-                                            break;
                                         }
-                                        break;
+                                        case "0":
+                                            // go back to doctor, user, admin
 
-                                    case 5:
-                                        //delete a user
-                                        System.out.println("Insert the username you want to delete");
-                                        String usernameDelete = keyboard.next();
-                                        String passwordDelete = "ok";
-
-                                        User userDelete = new User(usernameDelete, passwordDelete);
-                                        if (!mdb.delete_user_by_the_administrator(userDelete)) {
-                                            System.out.println(" username not found. Please choose another one.");
-                                        } else {
-                                            System.out.println("username deleted successful!");
-                                            break;
-                                        }
-                                        break;
-
-                                    case 6:
-                                        System.out.println("--ADMINISTRATOR--\nSelect a command: " +
-                                                "\n1. show cities with more registered users" +
-                                                "\n2. show the most expensive specialization" +
-                                                "\n\n0. Go back");
-                                        int analytics_adm = keyboard.nextInt();
-
-                                        switch (analytics_adm){
-                                            case 1:
-                                                mdb.printmostcity();
-                                               // mdb.printAvgUsers();
-                                                break;
-                                            case 2:
-                                                mdb.printMostExpSpec();
-                                                break;
-                                            case 0:
-                                                System.out.println("return to the menu");
-                                                break;}
+                                            continue;
+                                    }
 
 
-
-
-                                    case 0:
-                                        //go back
-                                        System.out.println("ok 0");
-                                        break;
-                                }
-                            }catch (Exception e){
-                                System.out.println("ERROR: insert a correct number.");
-                            }
                             break;
 
+
+                            default:
+                                System.out.println("Please, insert a number from 1 to 3");
+
+
                         }
-
-
-                    default:
-                        System.out.println("Please, insert a number from 1 to 3");
-
+                }catch(Exception e){
+                    System.out.println("ERROR: insert a number from 1 to 3.");
                 }
-            }catch (Exception e){
-                System.out.println("ERROR: insert a number from 1 to 3.");
-            }
 
             break;
 
