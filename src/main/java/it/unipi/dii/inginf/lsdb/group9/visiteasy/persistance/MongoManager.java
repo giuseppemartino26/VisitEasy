@@ -51,12 +51,11 @@ public class MongoManager {
 
     public MongoManager()
     {
-        mongoClient = MongoClients.create("mongodb://172.16.3.109:27020,172.16.3.110:27020,172.16.3.111:27020/" +
-               "?retryWrites=true&w=majority&wtimeout=10000");
+        mongoClient = MongoClients.create("mongodb://localhost");
       //  mongoClient = MongoClients.create();
         db = mongoClient.getDatabase("progetto");
         users = db.getCollection("users");
-        doctors = db.getCollection("doctors");
+        doctors = db.getCollection("doctors2");
         administrators = db.getCollection("administrator");
      //   clientSession = mongoClient.startSession();
     }
@@ -623,7 +622,9 @@ public class MongoManager {
 
         do {
 
-            System.out.println("Enter the time slot you want to add as hh:mm: ");
+            System.out.println("Available time slots are:\n09:00 - 09:30 - 10:00 - 10:30 - 11:00 - 11:30 - 12:00 - 12:30 "+
+                    "\n15:30 - 16:00 - 16:30 - 17:00 - 17:30 - 18:00 - 18:30"+
+                    "\nEnter the time slot you want to add as hh:mm: ");
             String orario = tastiera.readLine();
 
 
@@ -632,7 +633,7 @@ public class MongoManager {
                     i = i+1;
 
                 } else{
-                    System.out.println("Time slot not valid.");
+                    System.out.println("TIME SLOT NOT VALID!");
                 }
 
         } while (i<hour);
@@ -643,6 +644,7 @@ public class MongoManager {
         String date = tastiera.readLine();
         System.out.println("How many days do you want to add?");
         int day = keyboard.nextInt();
+        day = day -1;
 
         DateTime start = DateTime.parse(date);
         DateTime end = start.plusDays(day);

@@ -14,6 +14,7 @@ import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Doctor;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.utils.Methods;
 import java.io.*;
+import java.text.ParseException;
 import  java.util.*;
 import java.util.concurrent.*;
 
@@ -36,7 +37,7 @@ public class Main {
 
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         Runnable deleteRunnable = new Runnable() {
             @Override
@@ -58,7 +59,7 @@ public class Main {
                     "\n2. USER" +
                     "\n3. ADMINISTRATOR ");
 
-            try {
+
                 String option = tastiera.readLine();
 
 
@@ -71,7 +72,7 @@ public class Main {
                                 "\n2. [Sign up]" +
                                 "\n\n0. [Go back]");
 
-                        try {
+
                             String option_doctor = tastiera.readLine();
 
                             switch (option_doctor) {
@@ -87,15 +88,17 @@ public class Main {
                                         if (!mdb.login_doctor(doctor)) {
                                             System.out.println("Please retry");
                                         } else {
+
+                                            while (true) {
                                             System.out.println("--DOCTOR--\nSelect a command: " +
                                                     "\n1. [SHOW RESERVATIONS]" +
                                                     "\n2. [ADD DATES TO CALENDAR]" +
                                                     "\n3. [SHOW MY PROFILE]" +
                                                     "\n4. [SHOW REVIEWS]" +
 
-                                                    "\n\n0. [Go back]");
-                                            try {
-                                                while (true) {
+                                                    "\n\n0. [Shut down the application]");
+
+
                                                     String option_doctor2 = tastiera.readLine();
                                                     switch (option_doctor2) {
                                                         case "1":
@@ -105,6 +108,7 @@ public class Main {
                                                         case "2":
                                                             // a new doctor create the reservations
                                                             mdb.aggiungi_cal4(usernameD);
+                                                            System.out.println("New dates added successfully!");
                                                             break;
 
                                                         case "3":
@@ -120,13 +124,18 @@ public class Main {
                                                             }
 
                                                         case "0":
-                                                            continue; //torna indietro alla pagina principale
+                                                            mdb.closeconnection();
+                                                            ndb.close();
+                                                            System.exit(0);
+
+
+
+                                                        default:
+                                                            System.out.println("Please, select a correct command.");
+                                                            continue;
                                                     }
                                                 }
-                                            } catch (Exception e) {
-                                                System.out.println("ERROR: enter a correct number.");
-                                                continue;
-                                            }
+
 
 
                                         }
@@ -175,10 +184,7 @@ public class Main {
                                     System.out.println("Insert a correct number: ");
                                     continue;
                             }
-                        } catch (Exception e) {
-                            System.out.println("ERROR: insert a correct number.");
-                            continue;
-                        }
+
 
 
                     case "2":
@@ -186,9 +192,9 @@ public class Main {
                     while (true)
                    {
                         System.out.println("--USER--\nSelect a command: " +
-                                "\n1. Login" +
-                                "\n2. Sign up" +
-                                "\n\n0. Shut down the app");
+                                "\n1. [LOGIN]" +
+                                "\n2. [SIGN UP]" +
+                                "\n\n0. [Shut down the application]");
 
 
                        String option_user = tastiera.readLine();
@@ -214,9 +220,9 @@ public class Main {
                                         {
                                             System.out.println("***USER: " + username + "***" +
                                                     "\nSelect:" +
-                                                    "\n1 to find a doctor" +
-                                                    "\n2 to see all your reservations" +
-                                                    "\ne to shut down the app");
+                                                    "\n1. [FIND A DOCTOR]" +
+                                                    "\n2. [SHOW YOUR RESERVATIONS]" +
+                                                    "\ne. [SHUT DOWN THE APPLICATION]");
                                             String com = tastiera.readLine();
 
                                             switch (com) {
@@ -239,9 +245,9 @@ public class Main {
 
                                                     while (true) {
                                                         System.out.println("Choose the doctors by: (select a command)" +
-                                                                "\n1. Show the entire list of doctors" +
-                                                                "\n2. Show the top three cheapest doctors" +
-                                                                "\n3. Show the best doctors recommended by the system");
+                                                                "\n1. [SHOW THE ENTIRE LIST OF DOCTORS]" +
+                                                                "\n2. [SHOW TOP 3 CHEAPEST DOCTORS]" +
+                                                                "\n3. [SHOW BEST DOCTORS RECOMMENDED BY THE SYSTEM]");
 
                                                         String sort = tastiera.readLine();
 
@@ -275,11 +281,11 @@ public class Main {
 
                                                     while (true)
                                                     {
-                                                        System.out.println("Select: \n1  if you want to book a medical examination with the doctor" +
-                                                                                   "\n2  See all the doctor's reviews" +
-                                                                                    "\n3  Add a review to the doctor" +
-                                                                                    "\n0  Come back to the user page" +
-                                                                "                   \ne   to shut down the app");
+                                                        System.out.println("Select: \n1.  [BOOK A MEDICAL EXAMINATION WITH THE DOCTOR]" +
+                                                                                   "\n2.  [SHOW DOCTORS REVIEWS]" +
+                                                                                    "\n3.  [ADD A REVIEW TO THE DOCTOR]" +
+                                                                                    "\n\n0.  [Go back to the USER homepage]" +
+                                                                "                   \ne.   [Shut down the application]");
 
 
                                                         String book = tastiera.readLine();
@@ -303,7 +309,7 @@ public class Main {
                                                                 Doctor doctor = new Doctor(usernamedoc,"");
                                                                 Methods.printreviews(doctor);
 
-                                                                System.out.println("Select 1 if you want to add a like to a review or press another key to come back");
+                                                                System.out.println("Type 1 if you want to add a like to a review or press another key to come back");
                                                                 String like = tastiera.readLine();
 
                                                                 if (like.equals("1")){
@@ -312,7 +318,7 @@ public class Main {
                                                                     User user1 = new User(user.getUsername());
                                                                     Review review = new Review(rid);
                                                                     ndb.like(user1,review);
-                                                                    System.out.println("A like was added to the review");
+                                                                    System.out.println("A like was added to this review");
                                                                     continue;
                                                                 }else {
                                                                     continue;
@@ -326,7 +332,7 @@ public class Main {
 
                                                                 Review newreview = new Review(Methods.getAlphaNumericString(20),DateTime.now().toString(),user.getUsername(),rating,text,usernamedoc);
                                                                 ndb.addReview(newreview);
-                                                                System.out.println("New review added");
+                                                                System.out.println("New review added!");
                                                                 continue;
 
                                                             case "0":
@@ -356,7 +362,7 @@ public class Main {
 
                                                     Methods.printUserRes(username);
 
-                                                    System.out.println("Select 1 if you want to delete a reservation or press any key to return to the user page");
+                                                    System.out.println("Type 1 if you want to delete a reservation or press any key to return to the user page");
                                                     String d = tastiera.readLine();
                                                     if (d.equals("1")) {
                                                         System.out.println("Select the examination's datetime");
@@ -447,7 +453,7 @@ public class Main {
                                         if (!mdb.add_user(user)) {
                                             System.out.println("The username is already used. Please choose another one.");
                                         } else {
-                                            System.out.println("Registration successful!");
+                                            System.out.println("Registered successfully!");
                                             break;
                                         }
 
@@ -600,9 +606,9 @@ public class Main {
 
                                                         Doctor doctorDelete = new Doctor(usernameDeleteDoc, passwordDeleteDoc);
                                                         if (!mdb.delete_doctor_by_the_administrator(doctorDelete)) {
-                                                            System.out.println(" username not found. Please choose another one.");
+                                                            System.out.println("Username not found. Please choose another one.");
                                                         } else {
-                                                            System.out.println("doctor deleted successfully!");
+                                                            System.out.println("DOCTOR deleted successfully!");
                                                             break;
                                                         }
                                                         break;
@@ -615,7 +621,7 @@ public class Main {
 
                                                         User userDelete = new User(usernameDelete);
                                                         if (!mdb.delete_user_by_the_administrator(userDelete)) {
-                                                            System.out.println(" username not found. Please choose another one.");
+                                                            System.out.println("Username not found. Please choose another one.");
                                                         } else {
                                                             System.out.println("user deleted successful!");
                                                             break;
@@ -682,16 +688,11 @@ public class Main {
 
 
                         }
-                }catch(Exception e){
-                    System.out.println("ERROR: insert a number from 1 to 3.");
-                }
-
-            break;
 
 
         }
 
-        //break;
+
 
     }
 }

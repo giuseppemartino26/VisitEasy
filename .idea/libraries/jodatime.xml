@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="jodatime">
+    <CLASSES />
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/3.12.7/mongo-java-driver-3.12.7-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/mongodb/mongo-java-driver/3.12.7/mongo-java-driver-3.12.7-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
