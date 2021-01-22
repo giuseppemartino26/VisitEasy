@@ -1,9 +1,5 @@
 package it.unipi.dii.inginf.lsdb.group9.visiteasy.persistance;
 
-import com.mongodb.MongoCommandException;
-import com.mongodb.TransactionOptions;
-import com.mongodb.BasicDBObject;
-
 import com.mongodb.client.*;
 
 import java.io.BufferedReader;
@@ -25,11 +21,9 @@ import org.bson.conversions.Bson;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
-import javax.print.Doc;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 
 import static com.mongodb.client.model.Accumulators.sum;
 import static com.mongodb.client.model.Filters.*;
@@ -41,24 +35,24 @@ import static com.mongodb.client.model.Sorts.descending;
 
 public class MongoManager {
 
-   private final MongoClient mongoClient;
-   private final MongoDatabase db;
-   private final MongoCollection<Document> users;
-   private final MongoCollection<Document> doctors;
-   private final MongoCollection<Document> administrators;
- //  private ClientSession clientSession;
+    private final MongoClient mongoClient;
+    private final MongoDatabase db;
+    private final MongoCollection<Document> users;
+    private final MongoCollection<Document> doctors;
+    private final MongoCollection<Document> administrators;
+    //  private ClientSession clientSession;
 
 
     public MongoManager()
     {
-        mongoClient = MongoClients.create("mongodb://172.16.3.109:27020,172.16.3.110:27020,172.16.3.111:27020/" +
+       mongoClient = MongoClients.create("mongodb://172.16.3.109:27020,172.16.3.110:27020,172.16.3.111:27020/" +
                "?retryWrites=true&w=majority&wtimeout=10000");
-      //  mongoClient = MongoClients.create();
+       //   mongoClient = MongoClients.create();
         db = mongoClient.getDatabase("progetto");
         users = db.getCollection("users");
         doctors = db.getCollection("doctors");
         administrators = db.getCollection("administrator");
-     //   clientSession = mongoClient.startSession();
+        //   clientSession = mongoClient.startSession();
     }
 
     public MongoClient getMongoClient(){return mongoClient;}
@@ -91,7 +85,7 @@ public class MongoManager {
         Document result = doctors.find(eq("username", docusername)).first();
         String name = null;
         try {
-             name = result.getString("name");
+            name = result.getString("name");
         }catch (NullPointerException e){
             System.out.println("ERROR: no doctor found");
         }
@@ -299,7 +293,7 @@ public class MongoManager {
     /* Add reservations to the doctor with username = us from a date chosen by the doctor fino a 1 anno o quello che è     ( tutte le date hanno orari uguali che sceglie il dottore) */
 
 
- /* Elimina tutte le prenotazioni il cui giorno rientra in un range di date, dal calendario dei dottori e dalle prenotazioni degli utenti*/
+    /* Elimina tutte le prenotazioni il cui giorno rientra in un range di date, dal calendario dei dottori e dalle prenotazioni degli utenti*/
     void deleteReservation()
     {
         DateTime start = DateTime.now().minusDays(2);
@@ -310,7 +304,7 @@ public class MongoManager {
         for (DateTime d : between)
         {
             Bson delete = Updates.pull("calendar", new Document("date", d.toString(DateTimeFormat.shortDate())));
-          //  System.out.println(d.toString(DateTimeFormat.shortDate())+" 15.00");
+            //  System.out.println(d.toString(DateTimeFormat.shortDate())+" 15.00");
             Bson deleteu = Updates.pull("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())));
             doctors.updateMany(new Document(), delete);
             users.updateMany(new Document(),deleteu);
@@ -351,8 +345,8 @@ public class MongoManager {
             for (String o: orari)
             {
                 Bson delete = Updates.pull("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())+o));
-                 // System.out.println(d.toString(DateTimeFormat.shortDate())+o);
-               // Bson deleteu = Updates.pull("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())));
+                // System.out.println(d.toString(DateTimeFormat.shortDate())+o);
+                // Bson deleteu = Updates.pull("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())));
                 doctors.updateMany(new Document(), delete);
                 users.updateMany(new Document(), delete);
             }
@@ -454,24 +448,18 @@ public class MongoManager {
 
 
               /* clientSession = mongoClient.startSession();
-
                 TransactionBody<Void> transactionBody = new TransactionBody<Void>() {
                     @Override
                     public Void execute()
                     {
-
                         doctors.updateOne(clientSession,new Document("name", name).append("reservations.date", date), Updates.set("reservations.$.patient", user));
-
                         Document newres = new Document("date", date).append("doctor", name);
                         users.updateOne(clientSession,eq("username", user), Updates.push("reservations", newres));
                         return null;
                     }
                 };
-
                 try {
-
                     clientSession.withTransaction(transactionBody);
-
                 }catch (RuntimeException e){
                     System.out.println("ERROR: reservation not done");
                     return false;
@@ -523,6 +511,28 @@ public class MongoManager {
         }
 
     }
+/*crea list orari*/
+public ArrayList<String> orari(){
+        ArrayList<String> orari = new ArrayList<>();
+        orari.add("09:00");
+        orari.add("09:30");
+        orari.add("10:00");
+        orari.add("10:30");
+        orari.add("11:00");
+        orari.add("11:30");
+        orari.add("12:00");
+        orari.add("12:30");
+        orari.add("15:00");
+        orari.add("15:30");
+        orari.add("16:00");
+        orari.add("16:30");
+        orari.add("17:00");
+        orari.add("17:30");
+        orari.add("18:00");
+        orari.add("18:30");
+
+    return orari;
+    }
 
 
     /* Elimina tutte le prenotazioni il cui giorno rientra in un range di date, dal reservations dei dottori e dalle prenotazioni degli utenti*/
@@ -561,7 +571,7 @@ public class MongoManager {
             {
                 Bson delete = new Document ("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())+" "+o).append("patient",""));
                 System.out.println(delete);
-               // Bson delete = delete;
+                // Bson delete = delete;
                 doctors.updateMany(new Document(), delete);
                 //users.updateMany(new Document(),delete);
 
@@ -594,7 +604,7 @@ public class MongoManager {
     }
 
     //genera calendario dottore inserendo giorni da aggiungere e orari da aggiungere
-    public void aggiungi_cal4(String username) throws IOException, ParseException {
+  /*  public void aggiungi_cal4(String username) throws IOException, ParseException {
         ArrayList<String> ore = new ArrayList<>();
 
         ArrayList<String> orari = new ArrayList<>();
@@ -623,17 +633,17 @@ public class MongoManager {
 
         do {
 
-            System.out.println("Enter the time slot you want to add as hh:mm: ");
+            System.out.println("Enter the time slot you want to add as hh:mm ");
             String orario = tastiera.readLine();
 
 
-                if (orari.contains(orario)) {
-                    ore.add(orario);
-                    i = i+1;
+            if (orari.contains(orario)) {
+                ore.add(orario);
+                i = i+1;
 
-                } else{
-                    System.out.println("Time slot not valid.");
-                }
+            } else{
+                System.out.println("Time slot not valid.");
+            }
 
         } while (i<hour);
 
@@ -656,8 +666,55 @@ public class MongoManager {
             }
         }
 
+    }*/
+    //genera calendario dottore inserendo giorni da aggiungere e orari da aggiungere
+    public void aggiungi_cal4(String username) throws IOException, ParseException {
+        ArrayList<String> ore = new ArrayList<>();
+        ArrayList<String> orari = new ArrayList<>();
+        orari.add("09:00");
+        orari.add("09:30");
+        orari.add("10:00");
+        orari.add("10:30");
+        orari.add("11:00");
+        orari.add("11:30");
+        orari.add("12:00");
+        orari.add("12:30");
+        orari.add("15:00");
+        orari.add("15:30");
+        orari.add("16:00");
+        orari.add("16:30");
+        orari.add("17:00");
+        orari.add("17:30");
+        orari.add("18:00");
+        orari.add("18:30");
+        System.out.println("insert how many hours do you want to add");
+        int hour = keyboard.nextInt();
+        for (int i = 0; i < hour; i++) {
+            System.out.println("insert the hour you want to add in the format: hh:mm, among these hours");
+            System.out.println(orari);
+            String orario = tastiera.readLine();
+                    ore.add(orario);
     }
 
+
+        System.out.println("Insert the first date you want do add, in the format yyyy-MM-dd");
+        String date = tastiera.readLine();
+        System.out.println("insert how many days you want add:");
+        int day = keyboard.nextInt();
+day=day-1;
+        DateTime start = DateTime.parse(date);
+        DateTime end = start.plusDays(day);
+
+        List<DateTime> between = getDateRange(start, end);
+
+        for (DateTime d : between) {
+            for (String o : ore) {
+                Document newres = new Document("date", d.toString(DateTimeFormat.shortDate()) + " " + o).append("patient", "");
+                doctors.updateMany(new Document("username", username), Updates.push("reservations", newres));
+            }
+        }
+
+    }
 
 
     /* Mostra tutti gli slot disponibili di un dottore */
@@ -680,7 +737,7 @@ public class MongoManager {
     }
 
 
-    /* Mostra il reservations con le prenotazioni di un dottore */
+    /* Mostra tutto il calendario */
     public void showreservations(String username) {
 
         Bson match = match(eq("username",username));
@@ -718,7 +775,6 @@ public class MongoManager {
    /* void printAvgUsers() {
         Bson group1 = new Document("$group", new Document("_id", new Document("dateofBirth", "$dateofBirth"))
                 .append("age", new Document("$divide", new Document("$subtract", "$dateOfBirth" ))));
-
         Bson project1 = project(fields(excludeId(), computed("dateofBirth", "$_id.dateofBirth"),
                 include("age")));
         Document result = aggregate.first();

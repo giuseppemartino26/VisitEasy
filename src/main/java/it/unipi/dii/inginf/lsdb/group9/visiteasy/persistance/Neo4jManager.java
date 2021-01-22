@@ -37,10 +37,10 @@ public class Neo4jManager implements AutoCloseable {
 
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run( "MERGE (d:Doctors {docname: $name, specialization: $specialization, city: $city, price: $price})",
-            parameters( "name", name, "specialization", specialization, "city", city, "price",price ) );
-            return null;
-        });
-         }
+                        parameters( "name", name, "specialization", specialization, "city", city, "price",price ) );
+                return null;
+            });
+        }
     }
 
 
@@ -172,24 +172,24 @@ public class Neo4jManager implements AutoCloseable {
 
     public void printBestReviewers()
     {
-            try ( Session session = driver.session() )
-            {
-                session.readTransaction((TransactionWork<Void>) tx -> {
+        try ( Session session = driver.session() )
+        {
+            session.readTransaction((TransactionWork<Void>) tx -> {
 
-                            String query = "MATCH (u:User)-[:WRITES]->(r:Review)<-[:LIKES]-(u2:User) WITH u.username AS Username, count(u2) AS NumLikesReceived\n" +
-                                    "MATCH (u3:User)-[:WRITES]->(r3:Review) WHERE u3.username = Username\n" +
-                                    "RETURN u3.username AS Username, toFloat(NumLikesReceived)/count(r3) AS Ratio ORDER BY Ratio DESC LIMIT 3";
-                    Result result = tx.run(query);
-                    while(result.hasNext())
-                    {
-                        Record r = result.next();
-                        String user = r.get("Username").asString();
-                        double ratio = r.get("Ratio").asDouble();
-                        System.out.println("\"" + user + "\" with a ratio of " + ratio);
-                    }
-                    return null;
-                });
-            }
+                String query = "MATCH (u:User)-[:WRITES]->(r:Review)<-[:LIKES]-(u2:User) WITH u.username AS Username, count(u2) AS NumLikesReceived\n" +
+                        "MATCH (u3:User)-[:WRITES]->(r3:Review) WHERE u3.username = Username\n" +
+                        "RETURN u3.username AS Username, toFloat(NumLikesReceived)/count(r3) AS Ratio ORDER BY Ratio DESC LIMIT 3";
+                Result result = tx.run(query);
+                while(result.hasNext())
+                {
+                    Record r = result.next();
+                    String user = r.get("Username").asString();
+                    double ratio = r.get("Ratio").asDouble();
+                    System.out.println("\"" + user + "\" with a ratio of " + ratio);
+                }
+                return null;
+            });
+        }
 
     }
 
