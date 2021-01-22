@@ -51,11 +51,12 @@ public class MongoManager {
 
     public MongoManager()
     {
-        mongoClient = MongoClients.create("mongodb://localhost");
-      //  mongoClient = MongoClients.create();
+      //  mongoClient = MongoClients.create("mongodb://172.16.3.109:27020,172.16.3.110:27020,172.16.3.111:27020/" +
+      //         "?retryWrites=true&w=majority&wtimeout=10000");
+        mongoClient = MongoClients.create();
         db = mongoClient.getDatabase("progetto");
         users = db.getCollection("users");
-        doctors = db.getCollection("doctors2");
+        doctors = db.getCollection("doctors");
         administrators = db.getCollection("administrator");
      //   clientSession = mongoClient.startSession();
     }
@@ -678,6 +679,26 @@ public class MongoManager {
         Bson project = project(fields(excludeId(), include("reservations")));
 
         doctors.aggregate(Arrays.asList(match,unwind,match2,project)).forEach(printcale);
+        return datelibere;
+    }
+
+    public ArrayList<Reservation> showEntirereservationsDoc(String usernamedoc)
+    {
+        ArrayList<Reservation> datelibere = new ArrayList<>();
+        Consumer<Document> printcale = document -> {
+
+            //Reservation reservation = new Reservation(usernamedoc,document.getEmbedded(Arrays.asList("reservations", "date"), String.class, document.getEmbedded(Arrays.asList("reservations", ""), String.class));
+            String date = document.getEmbedded(Arrays.asList("reservations", "date"), String.class);
+            String patient = document.getEmbedded(Arrays.asList("reservations", "patient"), String.class);
+            Reservation reservation = new Reservation(usernamedoc,date,patient);
+            datelibere.add(reservation);
+        };
+
+        Bson match = match(eq("username",usernamedoc));
+        Bson unwind = unwind("$reservations");
+        Bson project = project(fields(excludeId(), include("reservations")));
+
+        doctors.aggregate(Arrays.asList(match,unwind,project)).forEach(printcale);
         return datelibere;
     }
 

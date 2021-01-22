@@ -16,8 +16,8 @@ import java.util.Scanner;
 public class Methods {
 
     private static MongoManager mdb = new MongoManager();
-    private static Neo4jManager ndb = new Neo4jManager("neo4j://localhost:11003", "neo4j", "root");
-
+ //   private static Neo4jManager ndb = new Neo4jManager("neo4j://localhost:11003", "neo4j", "root");
+ private static Neo4jManager ndb = new Neo4jManager("bolt://172.16.3.110:7687", "neo4j", "root2");
     private static Scanner keyboard = new Scanner(System.in);
     InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader tastiera = new BufferedReader(input);
@@ -126,6 +126,18 @@ public class Methods {
         }
 
         return sb.toString();
+    }
+
+
+    public static void printResDoc(String name){
+        ArrayList<Reservation> list = new ArrayList<>();
+        list = mdb.showEntirereservationsDoc(name);
+
+        System.out.println("---RESERVATIONS---");
+        for (int i = 0; i < list.size(); i++)
+        {
+            System.out.println(list.get(i).getDate()+"      patient: "+list.get(i).getUsername());
+        }
     }
 
 

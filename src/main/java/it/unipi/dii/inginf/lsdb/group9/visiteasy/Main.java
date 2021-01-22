@@ -25,7 +25,9 @@ public class Main {
 
     private static MongoManager mdb = new MongoManager();
     private static Scanner keyboard = new Scanner(System.in);
-    private static Neo4jManager ndb = new Neo4jManager("neo4j://localhost:11003", "neo4j", "root");
+    private static Neo4jManager ndb = new Neo4jManager("bolt://172.16.3.110:7687", "neo4j", "root2");
+    //   private static Neo4jManager ndb = new Neo4jManager("neo4j://localhost:11003", "neo4j", "root");
+
 
 
     private static InputStreamReader input = new InputStreamReader(System.in);
@@ -103,7 +105,8 @@ public class Main {
                                                     switch (option_doctor2) {
                                                         case "1":
                                                             //see doctor's reservations
-                                                            mdb.showreservations(usernameD);
+                                                           // mdb.showreservations(usernameD);
+                                                            Methods.printResDoc(usernameD);
                                                             break;
                                                         case "2":
                                                             // a new doctor create the reservations
@@ -116,12 +119,9 @@ public class Main {
                                                                 Methods.printMyProfile(usernameD);
                                                                 break;
                                                         case"4":
-                                                            Doctor doctor2 = new Doctor(usernameD, "");
-                                                            ArrayList<Review> reviews = ndb.showReviews3(doctor);
-                                                            for (int i = 0; i < reviews.size(); i++) {
-                                                                System.out.println("===================================================================================\n" +
-                                                                        "id_review:" + reviews.get(i).getId() + "\n" + reviews.get(i).getDateTime() + "\n" + reviews.get(i).getUsername() + "\nRating:" + reviews.get(i).getRating() + "\n" + reviews.get(i).getText());
-                                                            }
+
+                                                            Methods.printreviews(doctor);
+                                                            break;
 
                                                         case "0":
                                                             mdb.closeconnection();
@@ -166,7 +166,7 @@ public class Main {
                                             scan.nextLine();
                                         }
                                         int price = scan.nextInt();
-                                        Doctor doctor = new Doctor(username, password, price, name, city, bio, specialization, address);
+                                        Doctor doctor = new Doctor(username, password, price, name, city, specialization, bio, address);
 
                                         if (!mdb.add_doctor(doctor)) {
                                             System.out.println("The username is already used. Please choose another one.");
