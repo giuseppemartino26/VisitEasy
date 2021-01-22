@@ -693,7 +693,14 @@ public ArrayList<String> orari(){
             System.out.println("insert the hour you want to add in the format: hh:mm, among these hours");
             System.out.println(orari);
             String orario = tastiera.readLine();
-                    ore.add(orario);
+                    //ore.add(orario);
+                    for(int j=0;j<15;j++){
+                        if(orario.equals(orari.get(j))){
+                            ore.add(orario);
+                        }
+
+                        }
+
     }
 
 
