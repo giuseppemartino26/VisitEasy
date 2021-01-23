@@ -25,8 +25,8 @@ public class Main {
 
     private static MongoManager mdb = new MongoManager();
     private static Scanner keyboard = new Scanner(System.in);
- //   private static Neo4jManager ndb = new Neo4jManager("bolt://172.16.3.110:7687", "neo4j", "root2");
-       private static Neo4jManager ndb = new Neo4jManager("neo4j://localhost:11003", "neo4j", "root");
+    private static Neo4jManager ndb = new Neo4jManager("bolt://172.16.3.110:7687", "neo4j", "root2");
+    //   private static Neo4jManager ndb = new Neo4jManager("neo4j://localhost:11003", "neo4j", "root");
 
 
 
@@ -67,11 +67,6 @@ public class Main {
 
                 switch (option) {
 
-                    case "9":
-                        Review review234 = new Review("5ff0c5ebb7e95313fd8d78a5");
-                        ndb.deleteReview(review234);
-                        System.out.println("FATTO");
-
                     case "1":
 
                         System.out.println("--DOCTOR--\nWhat do you want to do? " +
@@ -102,6 +97,7 @@ public class Main {
                                                     "\n2. [ADD DATES TO CALENDAR]" +
                                                     "\n3. [SHOW MY PROFILE]" +
                                                     "\n4. [SHOW REVIEWS]" +
+                                                    "\n5. [UPDATE BIO OR ADDRESS]"+
 
                                                     "\n\n0. [Shut down the application]");
 
@@ -127,6 +123,40 @@ public class Main {
 
                                                             Methods.printreviews(doctor);
                                                             break;
+
+                                                        case "5":
+
+                                                            while(true) {
+                                                                System.out.print("\n1. [MODIFY BIO]" +
+                                                                        "\n2. [UPDATE ADDRESS]");
+
+                                                                String op = tastiera.readLine();
+                                                                switch (op){
+
+                                                                    case "1":
+                                                                        System.out.println("\nWrite something new about your bio: ");
+                                                                        String bio = tastiera.readLine();
+                                                                        mdb.updateBio(usernameD, bio);
+                                                                        System.out.println("Bio updated correctly!");
+                                                                        break;
+
+
+
+                                                                    case "2":
+                                                                        System.out.println("Update your address: ");
+                                                                        String address = tastiera.readLine();
+
+                                                                        mdb.updateAddress(usernameD, address);
+                                                                        System.out.println("Address updated correctly!");
+                                                                        break;
+
+                                                                    default:
+                                                                        System.out.println("Please, select a correct command.");
+                                                                        continue;
+
+
+                                                                }break;
+                                                            }break;
 
                                                         case "0":
                                                             mdb.closeconnection();
@@ -282,7 +312,6 @@ public class Main {
                                                     String usernamedoc = tastiera.readLine();
 
                                                     Methods.printMyProfile(usernamedoc);
-
 
 
                                                     while (true)
@@ -510,11 +539,11 @@ public class Main {
                                                         "\n1. [ADD AN ADMINISTRATOR]" +
                                                         "\n2. [ADD A DOCTOR]" +
                                                         "\n3. [ADD A USER]" +
-                                                        "\n4. [FIND A DOCTOR]"+
+                                                        "\n4. [DELETE A DOCTOR]" +
+                                                        "\n5. [DELETE A USER]" +
                                                         "\n6. [SHOW ANALYTICS]" +
 
-
-                                                        "\n\n0. [Go back]");
+                                                        "\n\n0. [Shut down the application.]");
 
 
                                                 String option_administrator = tastiera.readLine();
@@ -604,7 +633,7 @@ public class Main {
                                                                 break;
                                                             }break;
 
-                                               /*     case "4":
+                                                    case "4":
                                                         //delete a doctor
                                                         System.out.println("Insert the username of the doctor you want to delete");
                                                         String usernameDeleteDoc = tastiera.readLine();
@@ -617,11 +646,11 @@ public class Main {
                                                             System.out.println("DOCTOR deleted successfully!");
                                                             break;
                                                         }
-                                                        break; */
+                                                        break;
 
                                                     case "5":
                                                         //delete a user
-                                                  /*      System.out.println("Insert the username of the user you want to delete");
+                                                        System.out.println("Insert the username of the user you want to delete");
                                                         String usernameDelete = tastiera.readLine();
 
 
@@ -632,7 +661,7 @@ public class Main {
                                                             System.out.println("user deleted successful!");
                                                             break;
                                                         }
-                                                        break; */
+                                                        break;
 
                                                     case "6":
                                                         System.out.println("--ADMINISTRATOR--\nSelect a command: " +
@@ -663,81 +692,6 @@ public class Main {
                                                             default:
                                                                 System.out.println("INCORRECT COMMAND. Please retry");
                                                         }
-                                                        break;
-
-                                                    case "4":
-                                                        Methods.printAllDocList2();
-
-                                                        System.out.println("Insert the doctors \"us\" that you want to see");
-
-                                                        String usernamedoc = tastiera.readLine();
-
-                                                        try {
-                                                            Methods.printMyProfile(usernamedoc);
-                                                        }catch (NullPointerException e){
-                                                            System.out.println("ERROR: Not found a doctor with the selected us");
-                                                            continue;
-                                                        }
-
-                                                        System.out.println("------REVIEWS-------");
-
-                                                        Doctor doctor2 = new Doctor(usernamedoc,"");
-                                                        Methods.printreviews(doctor2);
-
-                                                        System.out.println("Select :" +
-                                                                "\n1. [DELETE A DOCTOR]" +
-                                                                "\n2. [DELETE A USER]" +
-                                                                "\n3. [DELETE A REVIEW]");
-
-                                                        String optionad = tastiera.readLine();
-
-                                                        while (true) {
-                                                            switch (optionad)
-                                                            {
-                                                                case "1":
-                                                                    //delete a doctor
-
-                                                                    if (!mdb.delete_doctor_by_the_administrator(doctor2)) {
-                                                                        System.out.println("Username not found. Please choose another one.");
-                                                                    } else {
-                                                                        System.out.println("DOCTOR deleted successfully!");
-                                                                        break;
-                                                                    }
-                                                                    break;
-
-                                                                case "2":
-                                                                    //delete a user
-                                                                    System.out.println("Insert the username of the user you want to delete");
-                                                                    String usernameDelete = tastiera.readLine();
-
-
-                                                                    User userDelete = new User(usernameDelete);
-                                                                    if (!mdb.delete_user_by_the_administrator(userDelete)) {
-                                                                        System.out.println("Username not found. Please choose another one.");
-                                                                    } else {
-                                                                        System.out.println("user deleted successful!");
-                                                                        break;
-                                                                    }
-
-                                                                    break;
-
-                                                                case "3":
-                                                                    System.out.println("Insert the review ID that you want to remove");
-                                                                    String idr = tastiera.readLine();
-                                                                    Review reviewr = new Review(idr);
-                                                                    ndb.deleteReview(reviewr);
-                                                                    System.out.println("Review deleted");
-                                                                    break;
-
-                                                                default:
-                                                                    System.out.println("Please select a number from 1 to 3");
-
-                                                            }
-                                                            break;
-                                                        }
-
-
-
 
 
                                                     case "0":
@@ -755,7 +709,10 @@ public class Main {
 
                                         }
                                         case "0":
-                                            // go back to doctor, user, admin
+                                            mdb.closeconnection();
+                                            ndb.close();
+                                            System.exit(0);
+
 
                                             continue;
                                     }

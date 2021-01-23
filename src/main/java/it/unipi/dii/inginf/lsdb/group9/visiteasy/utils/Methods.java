@@ -145,7 +145,7 @@ public class Methods {
 
     public static void printResDoc(String name){
         ArrayList<Reservation> list = new ArrayList<>();
-        list = mdb.showEntirereservationsDoc(name);
+        list = mdb.showEntirereservations(name);
 
         System.out.println("---RESERVATIONS---");
         for (int i = 0; i < list.size(); i++)
