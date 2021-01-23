@@ -272,12 +272,12 @@ public class Neo4jManager implements AutoCloseable {
                 while(result.hasNext())
                 {
                     Record r = result.next();
-                     count.set(r.get("count").asInt());
+                    count.set(r.get("count").asInt());
                 }
                 return null;
             });
         }
-       return count.get();
+        return count.get();
     }
 
 

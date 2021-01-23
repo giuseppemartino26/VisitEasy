@@ -1,6 +1,8 @@
 package it.unipi.dii.inginf.lsdb.group9.visiteasy.persistance;
 
-import com.mongodb.*;
+import com.mongodb.MongoCommandException;
+import com.mongodb.TransactionOptions;
+import com.mongodb.BasicDBObject;
 
 import com.mongodb.client.*;
 
@@ -13,7 +15,6 @@ import  java.util.*;
 import java.lang.*;
 
 import com.mongodb.client.model.*;
-import com.mongodb.client.result.UpdateResult;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Administrator;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Reservation;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
@@ -40,24 +41,24 @@ import static com.mongodb.client.model.Sorts.descending;
 
 public class MongoManager {
 
-   private final MongoClient mongoClient;
-   private final MongoDatabase db;
-   private final MongoCollection<Document> users;
-   private final MongoCollection<Document> doctors;
-   private final MongoCollection<Document> administrators;
- //  private ClientSession clientSession;
+    private final MongoClient mongoClient;
+    private final MongoDatabase db;
+    private final MongoCollection<Document> users;
+    private final MongoCollection<Document> doctors;
+    private final MongoCollection<Document> administrators;
+    //  private ClientSession clientSession;
 
 
     public MongoManager()
     {
-        mongoClient = MongoClients.create("mongoClient = MongoClients.create(\"mongodb://172.16.3.109:27020,172.16.3.110:27020,172.16.3.111:27020/\" +\n" +
-                "               \"?retryWrites=true&w=majority&wtimeout=10000\");");
-      //  mongoClient = MongoClients.create();
+        //  mongoClient = MongoClients.create("mongodb://172.16.3.109:27020,172.16.3.110:27020,172.16.3.111:27020/" +
+        //         "?retryWrites=true&w=majority&wtimeout=10000");
+        mongoClient = MongoClients.create();
         db = mongoClient.getDatabase("progetto");
         users = db.getCollection("users");
         doctors = db.getCollection("doctors");
         administrators = db.getCollection("administrator");
-     //   clientSession = mongoClient.startSession();
+        //   clientSession = mongoClient.startSession();
     }
 
     public MongoClient getMongoClient(){return mongoClient;}
@@ -90,7 +91,7 @@ public class MongoManager {
         Document result = doctors.find(eq("username", docusername)).first();
         String name = null;
         try {
-             name = result.getString("name");
+            name = result.getString("name");
         }catch (NullPointerException e){
             System.out.println("ERROR: no doctor found");
         }
@@ -196,7 +197,6 @@ public class MongoManager {
 
 
 
-
     public void display_cities() //stampa tutte le città presenti nel DB
     {
         Bson myGroup = Aggregates.group("$city");
@@ -268,34 +268,6 @@ public class MongoManager {
         return  doctor;
     }
 
-    public void updateBio(String username, String bio){
-
-
-        Document result = doctors.find(eq("username", username)).first();
-
-        BasicDBObject newDocument = new BasicDBObject();
-        newDocument.put("bio", bio); // (2)
-
-        BasicDBObject updateObject = new BasicDBObject();
-        updateObject.put("$set", newDocument); // (3)
-
-        db.getCollection("doctors").updateOne(result, updateObject);
-
-
-    }
-
-    public void updateAddress(String username, String address){
-        Document result = doctors.find(eq("username", username)).first();
-
-        BasicDBObject newDocument = new BasicDBObject();
-        newDocument.put("address", address); // (2)
-
-        BasicDBObject updateObject = new BasicDBObject();
-        updateObject.put("$set", newDocument); // (3)
-
-        db.getCollection("doctors").updateOne(result, updateObject);
-    }
-
 
     //DELETE USER
     public boolean delete_user_by_the_administrator(User user)
@@ -325,7 +297,7 @@ public class MongoManager {
         return true;
     }
 
-/* Restituisce il documento trovato*/
+    /* Restituisce il documento trovato*/
     public Document store(Doctor doctor)
     {
         Document result = new Document();
@@ -355,7 +327,7 @@ public class MongoManager {
     /* Add reservations to the doctor with username = us from a date chosen by the doctor fino a 1 anno o quello che è     ( tutte le date hanno orari uguali che sceglie il dottore) */
 
 
- /* Elimina tutte le prenotazioni il cui giorno rientra in un range di date, dal calendario dei dottori e dalle prenotazioni degli utenti*/
+    /* Elimina tutte le prenotazioni il cui giorno rientra in un range di date, dal calendario dei dottori e dalle prenotazioni degli utenti*/
     void deleteReservation()
     {
         DateTime start = DateTime.now().minusDays(2);
@@ -366,7 +338,7 @@ public class MongoManager {
         for (DateTime d : between)
         {
             Bson delete = Updates.pull("calendar", new Document("date", d.toString(DateTimeFormat.shortDate())));
-          //  System.out.println(d.toString(DateTimeFormat.shortDate())+" 15.00");
+            //  System.out.println(d.toString(DateTimeFormat.shortDate())+" 15.00");
             Bson deleteu = Updates.pull("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())));
             doctors.updateMany(new Document(), delete);
             users.updateMany(new Document(),deleteu);
@@ -407,8 +379,8 @@ public class MongoManager {
             for (String o: orari)
             {
                 Bson delete = Updates.pull("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())+o));
-                 // System.out.println(d.toString(DateTimeFormat.shortDate())+o);
-               // Bson deleteu = Updates.pull("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())));
+                // System.out.println(d.toString(DateTimeFormat.shortDate())+o);
+                // Bson deleteu = Updates.pull("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())));
                 doctors.updateMany(new Document(), delete);
                 users.updateMany(new Document(), delete);
             }
@@ -617,7 +589,7 @@ public class MongoManager {
             {
                 Bson delete = new Document ("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())+" "+o).append("patient",""));
                 System.out.println(delete);
-               // Bson delete = delete;
+                // Bson delete = delete;
                 doctors.updateMany(new Document(), delete);
                 //users.updateMany(new Document(),delete);
 
@@ -685,13 +657,13 @@ public class MongoManager {
             String orario = tastiera.readLine();
 
 
-                if (orari.contains(orario)) {
-                    ore.add(orario);
-                    i = i+1;
+            if (orari.contains(orario)) {
+                ore.add(orario);
+                i = i+1;
 
-                } else{
-                    System.out.println("TIME SLOT NOT VALID!");
-                }
+            } else{
+                System.out.println("TIME SLOT NOT VALID!");
+            }
 
         } while (i<hour);
 
@@ -701,7 +673,7 @@ public class MongoManager {
         String date = tastiera.readLine();
         System.out.println("How many days do you want to add?");
         int day = keyboard.nextInt();
-        day = day - 1;
+        day = day -1;
 
         DateTime start = DateTime.parse(date);
         DateTime end = start.plusDays(day);
@@ -735,6 +707,26 @@ public class MongoManager {
         Bson project = project(fields(excludeId(), include("reservations")));
 
         doctors.aggregate(Arrays.asList(match,unwind,match2,project)).forEach(printcale);
+        return datelibere;
+    }
+
+    public ArrayList<Reservation> showEntirereservationsDoc(String usernamedoc)
+    {
+        ArrayList<Reservation> datelibere = new ArrayList<>();
+        Consumer<Document> printcale = document -> {
+
+            //Reservation reservation = new Reservation(usernamedoc,document.getEmbedded(Arrays.asList("reservations", "date"), String.class, document.getEmbedded(Arrays.asList("reservations", ""), String.class));
+            String date = document.getEmbedded(Arrays.asList("reservations", "date"), String.class);
+            String patient = document.getEmbedded(Arrays.asList("reservations", "patient"), String.class);
+            Reservation reservation = new Reservation(usernamedoc,date,patient);
+            datelibere.add(reservation);
+        };
+
+        Bson match = match(eq("username",usernamedoc));
+        Bson unwind = unwind("$reservations");
+        Bson project = project(fields(excludeId(), include("reservations")));
+
+        doctors.aggregate(Arrays.asList(match,unwind,project)).forEach(printcale);
         return datelibere;
     }
 
