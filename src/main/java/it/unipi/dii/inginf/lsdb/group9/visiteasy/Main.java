@@ -111,6 +111,7 @@ public class Main {
                                                     "\n2. [ADD DATES TO CALENDAR]" +
                                                     "\n3. [SHOW MY PROFILE]" +
                                                     "\n4. [SHOW REVIEWS]" +
+                                                    "\n5. [UPDATE BIO OR ADDRESS]"+
 
                                                     "\n\n0. [Shut down the application]");
 
@@ -136,6 +137,40 @@ public class Main {
 
                                                             Methods.printreviews(doctor);
                                                             break;
+
+                                                        case "5":
+
+                                                            while(true) {
+                                                                System.out.print("\n1. [MODIFY BIO]" +
+                                                                        "\n2. [UPDATE ADDRESS]");
+
+                                                                String op = tastiera.readLine();
+                                                                switch (op){
+
+                                                                    case "1":
+                                                                        System.out.println("\nWrite something new about your bio: ");
+                                                                        String bio = tastiera.readLine();
+                                                                        mdb.updateBio(usernameD, bio);
+                                                                        System.out.println("Bio updated correctly!");
+                                                                        break;
+
+
+
+                                                                    case "2":
+                                                                        System.out.println("Update your address: ");
+                                                                        String address = tastiera.readLine();
+
+                                                                        mdb.updateAddress(usernameD, address);
+                                                                        System.out.println("Address updated correctly!");
+                                                                        break;
+
+                                                                    default:
+                                                                        System.out.println("Please, select a correct command.");
+                                                                        continue;
+
+
+                                                                }break;
+                                                            }break;
 
                                                         case "0":
                                                             mdb.closeconnection();
