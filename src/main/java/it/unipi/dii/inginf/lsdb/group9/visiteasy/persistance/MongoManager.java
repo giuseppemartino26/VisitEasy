@@ -297,6 +297,21 @@ public class MongoManager {
         return true;
     }
 
+/* Restituisce il documento trovato*/
+    public Document store(Doctor doctor)
+    {
+        Document result = new Document();
+        return  result = doctors.find(eq("username", doctor.getUsername())).first();
+    }
+
+    public void addDocument(Document document)
+    {
+        doctors.insertOne(document);
+    }
+
+
+
+
     /* Restituisce una lista di date dalla data start a quella di end*/
     public static List<DateTime> getDateRange(DateTime start, DateTime end)
     {

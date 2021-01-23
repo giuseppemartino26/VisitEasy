@@ -3,13 +3,12 @@ package it.unipi.dii.inginf.lsdb.group9.visiteasy.persistance;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Doctor;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Review;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
-import org.joda.time.DateTime;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
-import org.neo4j.driver.types.Node;
-import org.neo4j.driver.types.Path;
+
 import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static org.neo4j.driver.Values.parameters;
 
 public class Neo4jManager implements AutoCloseable {
@@ -63,12 +62,12 @@ public class Neo4jManager implements AutoCloseable {
     {
         try ( Session session = driver.session() )
         {
-            String docname = doctor.getName();
+            String username = doctor.getUsername();
 
             session.writeTransaction((TransactionWork<Void>) tx -> {
-                tx.run( "MATCH (n { docname: $docname })\n" +
+                tx.run( "MATCH (n { doc_id: $docname })\n" +
                                 "DETACH DELETE n",
-                        parameters( "docname", docname ) );
+                        parameters( "docname", username ) );
                 return null;
             });
         }
@@ -257,6 +256,30 @@ public class Neo4jManager implements AutoCloseable {
         }
 
     }
+
+    /*Returns 1 if the node is present in the DB, */
+    public int findNode(Doctor doctor)
+    {
+        AtomicInteger count = new AtomicInteger();
+        try ( Session session = driver.session() )
+        {
+            String username = doctor.getUsername();
+
+            session.readTransaction((TransactionWork<Integer>) tx -> {
+
+                String query = "MATCH (d:Doctors) WHERE d.doc_id = $username RETURN count(*) AS count";
+                Result result = tx.run(query,parameters("username",username));
+                while(result.hasNext())
+                {
+                    Record r = result.next();
+                     count.set(r.get("count").asInt());
+                }
+                return null;
+            });
+        }
+       return count.get();
+    }
+
 
 
 

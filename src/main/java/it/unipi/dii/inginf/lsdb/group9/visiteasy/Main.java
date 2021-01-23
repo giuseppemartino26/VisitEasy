@@ -6,6 +6,7 @@ import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.*;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.persistance.MongoManager;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.persistance.Neo4jManager;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.utils.Methods;
+import org.bson.Document;
 import org.joda.time.DateTime;
 
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Administrator;
@@ -68,8 +69,16 @@ public class Main {
                 switch (option) {
 
                     case "9":
-                        Review review234 = new Review("5ff0c5ebb7e95313fd8d78a5");
-                        ndb.deleteReview(review234);
+                     /*   Review review234 = new Review("5ff0c5ebb7e95313fd8d78a5");
+                        ndb.deleteReview(review234); */
+
+                        Doctor doctor234 = new Doctor("5fe8ade83a65753d7c4b4667","");
+                        ndb.deleteDoctor(doctor234);
+                     /*  Document docc = mdb.store(doctor234);
+                       System.out.println(docc.getString("name")); */
+                     // System.out.println(ndb.findNode(doctor234));
+
+
                         System.out.println("FATTO");
 
                     case "1":
@@ -511,10 +520,11 @@ public class Main {
                                                         "\n2. [ADD A DOCTOR]" +
                                                         "\n3. [ADD A USER]" +
                                                         "\n4. [FIND A DOCTOR]"+
-                                                        "\n6. [SHOW ANALYTICS]" +
+                                                        "\n5. [SHOW ANALYTICS]" +
 
 
-                                                        "\n\n0. [Go back]");
+                                                        "\n\n0. [Go back]" +
+                                                        "\ne  [Shut down the app]");
 
 
                                                 String option_administrator = tastiera.readLine();
@@ -573,27 +583,7 @@ public class Main {
                                                             System.out.println("Insert city");
                                                             String cityN = tastiera.readLine();
 
-                                           /* Date dateofBirth = null;
 
-                                            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
-                                            sdf.setLenient(false); // strict parsing
-                                            try {
-                                                dateofBirth = sdf.parse(d);
-                                            } catch (ParseException e) {
-                                                e.printStackTrace();
-                                            }
-
-                                            GregorianCalendar cal = new GregorianCalendar();
-                                            cal.setTime(dateofBirth);
-
-                                            int giorno = cal.get(Calendar.DAY_OF_MONTH);
-                                            int mese = cal.get(Calendar.MONTH) + 1;
-                                            int anno = cal.get(Calendar.YEAR);
-                                            if(giorno>31|| mese>13|| anno>2002){
-                                                System.out.println("ERROR: Insert right date");
-                                                break;
-                                            }
-*/
 
                                                             User user = new User(usernameN, passwordN, cityN);
 
@@ -604,43 +594,16 @@ public class Main {
                                                                 break;
                                                             }break;
 
-                                               /*     case "4":
-                                                        //delete a doctor
-                                                        System.out.println("Insert the username of the doctor you want to delete");
-                                                        String usernameDeleteDoc = tastiera.readLine();
-                                                        String passwordDeleteDoc = "ok";
 
-                                                        Doctor doctorDelete = new Doctor(usernameDeleteDoc, passwordDeleteDoc);
-                                                        if (!mdb.delete_doctor_by_the_administrator(doctorDelete)) {
-                                                            System.out.println("Username not found. Please choose another one.");
-                                                        } else {
-                                                            System.out.println("DOCTOR deleted successfully!");
-                                                            break;
-                                                        }
-                                                        break; */
+
 
                                                     case "5":
-                                                        //delete a user
-                                                  /*      System.out.println("Insert the username of the user you want to delete");
-                                                        String usernameDelete = tastiera.readLine();
-
-
-                                                        User userDelete = new User(usernameDelete);
-                                                        if (!mdb.delete_user_by_the_administrator(userDelete)) {
-                                                            System.out.println("Username not found. Please choose another one.");
-                                                        } else {
-                                                            System.out.println("user deleted successful!");
-                                                            break;
-                                                        }
-                                                        break; */
-
-                                                    case "6":
                                                         System.out.println("--ADMINISTRATOR--\nSelect a command: " +
                                                                 "\n1. [SHOW CITIES WITH MORE USERS]" +
                                                                 "\n2. [SHOW MOST EXPENSIVE SPECIALIZATIONS]" +
                                                                 "\n3. [SHOW ACTIVE REVIEWERS]" +
                                                                 "\n4. [SHOW BEST REVIEWERS]" +
-                                                                "\n\n0. Go back");
+                                                                "\n\n0. Go back" );
                                                         String analytics_adm = tastiera.readLine();
 
                                                         switch (analytics_adm) {
@@ -685,21 +648,31 @@ public class Main {
                                                         Methods.printreviews(doctor2);
 
                                                         System.out.println("Select :" +
-                                                                "\n1. [DELETE A DOCTOR]" +
+                                                                "\n1. [DELETE THE DOCTOR]" +
                                                                 "\n2. [DELETE A USER]" +
-                                                                "\n3. [DELETE A REVIEW]");
+                                                                "\n3. [DELETE A REVIEW]" +
+                                                                "\n\n0. [GO BACK]");
 
                                                         String optionad = tastiera.readLine();
 
-                                                        while (true) {
+                                                        while (true)
+                                                        {
                                                             switch (optionad)
                                                             {
-                                                                case "1":
-                                                                    //delete a doctor
+                                                                case "1": //DELETE DOCTOR
+
+                                                                    //salvo il documento
+                                                                  Document store =  mdb.store(doctor2);
 
                                                                     if (!mdb.delete_doctor_by_the_administrator(doctor2)) {
                                                                         System.out.println("Username not found. Please choose another one.");
                                                                     } else {
+                                                                        ndb.deleteDoctor(doctor2);
+                                                                        if (ndb.findNode(doctor2) == 1) //delete fallita su neo4j
+                                                                        {
+                                                                            mdb.addDocument(store); //riaggiungo su mongo
+                                                                        }
+
                                                                         System.out.println("DOCTOR deleted successfully!");
                                                                         break;
                                                                     }
@@ -715,7 +688,9 @@ public class Main {
                                                                     if (!mdb.delete_user_by_the_administrator(userDelete)) {
                                                                         System.out.println("Username not found. Please choose another one.");
                                                                     } else {
-                                                                        System.out.println("user deleted successful!");
+
+                                                                        ndb.deleteUser(userDelete);
+                                                                        System.out.println("user deleted successfully!");
                                                                         break;
                                                                     }
 
@@ -727,6 +702,9 @@ public class Main {
                                                                     Review reviewr = new Review(idr);
                                                                     ndb.deleteReview(reviewr);
                                                                     System.out.println("Review deleted");
+                                                                    break;
+
+                                                                case "0":
                                                                     break;
 
                                                                 default:
@@ -742,8 +720,14 @@ public class Main {
 
                                                     case "0":
                                                         //go back
-
                                                         break;
+
+                                                    case "e":
+                                                        mdb.closeconnection();
+                                                        ndb.close();
+                                                        System.exit(0);
+
+
 
                                                     default:
                                                         System.out.println("INCORRECT COMMAND. Please retry");
