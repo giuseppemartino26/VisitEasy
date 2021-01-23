@@ -223,6 +223,19 @@ public class MongoManager {
         return doclist;
     }
 
+    public ArrayList<Doctor> getAllDoc()
+    {
+        ArrayList<Doctor> doclist = new ArrayList<>();
+
+        Consumer<Document> addtolist = document -> {
+            Doctor newdoc = new Doctor(document.getString("username"),"",document.getString("name"));
+            doclist.add(newdoc);
+        };
+
+        doctors.find().forEach(addtolist);
+        return doclist;
+    }
+
 
     public ArrayList<Doctor> cheapestDoc(String city, String specialization)
     {

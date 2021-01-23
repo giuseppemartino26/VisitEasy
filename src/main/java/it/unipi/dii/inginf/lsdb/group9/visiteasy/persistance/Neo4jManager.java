@@ -74,6 +74,20 @@ public class Neo4jManager implements AutoCloseable {
         }
     }
 
+    public void deleteReview(Review review)
+    {
+        try ( Session session = driver.session() )
+        {
+            String id = review.getId();
+
+            session.writeTransaction((TransactionWork<Void>) tx -> {
+                tx.run( "MATCH (r:Review) WHERE r.review_id = $id DETACH DELETE r",
+                        parameters( "id", id ) );
+                return null;
+            });
+        }
+    }
+
 
     public void deleteUser(User user)
     {

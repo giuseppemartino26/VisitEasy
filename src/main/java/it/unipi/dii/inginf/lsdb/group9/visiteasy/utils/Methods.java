@@ -16,8 +16,8 @@ import java.util.Scanner;
 public class Methods {
 
     private static MongoManager mdb = new MongoManager();
- //   private static Neo4jManager ndb = new Neo4jManager("neo4j://localhost:11003", "neo4j", "root");
- private static Neo4jManager ndb = new Neo4jManager("bolt://172.16.3.110:7687", "neo4j", "root2");
+    private static Neo4jManager ndb = new Neo4jManager("neo4j://localhost:11003", "neo4j", "root");
+// private static Neo4jManager ndb = new Neo4jManager("bolt://172.16.3.110:7687", "neo4j", "root2");
     private static Scanner keyboard = new Scanner(System.in);
     InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader tastiera = new BufferedReader(input);
@@ -30,6 +30,20 @@ public class Methods {
         doclist = mdb.getDocByCitySpec(city, spec);
 
         System.out.println("----List of all "+spec+" of "+city+"----");
+
+        for (int i = 0; i < doclist.size(); i++)
+        {
+            System.out.println(doclist.get(i).getName()+" us:"+doclist.get(i).getUsername());
+        }
+    }
+
+
+    public static void printAllDocList2()
+    {
+        ArrayList<Doctor> doclist = new ArrayList<>();
+        doclist = mdb.getAllDoc();
+
+        System.out.println("----List of all doctors----");
 
         for (int i = 0; i < doclist.size(); i++)
         {
