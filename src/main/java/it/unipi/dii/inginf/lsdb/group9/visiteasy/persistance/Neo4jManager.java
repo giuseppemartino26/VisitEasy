@@ -5,7 +5,6 @@ import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Review;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
-
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -25,38 +24,6 @@ public class Neo4jManager implements AutoCloseable {
     }
 
 
-    public void addDoctor(Doctor doctor)
-    {
-        try ( Session session = driver.session() )
-        {
-            String name = doctor.getName();
-            String specialization = doctor.getSpecialization();
-            String city = doctor.getCity();
-            int price = doctor.getPrice();
-
-            session.writeTransaction((TransactionWork<Void>) tx -> {
-                tx.run( "MERGE (d:Doctors {docname: $name, specialization: $specialization, city: $city, price: $price})",
-                        parameters( "name", name, "specialization", specialization, "city", city, "price",price ) );
-                return null;
-            });
-        }
-    }
-
-
-    public void addUser(User user)
-    {
-        try ( Session session = driver.session() )
-        {
-            String username = user.getUsername();
-
-
-            session.writeTransaction((TransactionWork<Void>) tx -> {
-                tx.run( "MERGE (u:User {username: $username})",
-                        parameters( "username", username ) );
-                return null;
-            });
-        }
-    }
 
     public void deleteDoctor(Doctor doctor)
     {
@@ -128,7 +95,7 @@ public class Neo4jManager implements AutoCloseable {
     }
 
 
-
+/* Returns a list of Review objects related to all the reviews of a given doctor*/
     public ArrayList<Review> showReviews3(Doctor doctor)
     {
         ArrayList<Review> reviewList = new ArrayList<>();
@@ -158,12 +125,12 @@ public class Neo4jManager implements AutoCloseable {
 
                 return null;
             });
-            //   System.out.println(movieTitles);
         }
         return reviewList;
     }
 
 
+    /*Put a relationship like in the grapg database from a user to a review*/
     public void like(User user,Review review)
     {
         try ( Session session = driver.session() )
@@ -183,6 +150,7 @@ public class Neo4jManager implements AutoCloseable {
 
     }
 
+
     public void printBestReviewers()
     {
         try ( Session session = driver.session() )
@@ -200,13 +168,15 @@ public class Neo4jManager implements AutoCloseable {
                     double ratio = r.get("Ratio").asDouble();
                     System.out.println("\"" + user + "\" with a ratio of " + ratio);
                 }
+
                 return null;
             });
         }
 
     }
 
-
+    /* FUNZIONA SOLO IN LOCALE, NON SIAMO RIUSCITI A INSTALLARE IL PLUGIN APOC SULLA VM */
+    /* Stampa il ranking degli utenti più attivi: quelli con più recensioni nell'ultimo mese*/
     public void printActiveReviewers()
     {
         try ( Session session = driver.session() )
@@ -232,19 +202,23 @@ public class Neo4jManager implements AutoCloseable {
 
     }
 
-    public void recommendedDoctors(String city, String specialization)
+    public int recommendedDoctors(String city, String specialization)
     {
+        AtomicInteger count = new AtomicInteger();
+
         try ( Session session = driver.session() )
         {
-            session.readTransaction((TransactionWork<Void>) tx -> {
+            session.readTransaction((TransactionWork<Integer>) tx -> {
 
                 String query = "MATCH (r:Review)-[:BELONGSTO]->(d:Doctors)" +
                         " WHERE d.city = $city AND d.specialization= $specialization" +
                         " WITH d.docname AS docname, d.doc_id AS us, avg(r.rating) AS AverageRating, count(r) AS NumReviews\n" +
                         "RETURN docname, us, 5*AverageRating/10 + 5*(1-exp(-NumReviews/10)) AS score ORDER BY score DESC LIMIT 10";
                 Result result = tx.run(query,parameters("city",city,"specialization",specialization));
+
                 while(result.hasNext())
                 {
+                    count.getAndIncrement();
                     Record r = result.next();
                     String docname = r.get("docname").asString();
                     String usernamedoc = r.get("us").asString();
@@ -254,10 +228,11 @@ public class Neo4jManager implements AutoCloseable {
                 return null;
             });
         }
+        return count.get();
 
     }
 
-    /*Returns 1 if the node is present in the DB, */
+    /*Returns the number of found doctor node of a given doctor in the DB, */
     public int findNode(Doctor doctor)
     {
         AtomicInteger count = new AtomicInteger();
@@ -279,6 +254,31 @@ public class Neo4jManager implements AutoCloseable {
         }
         return count.get();
     }
+
+    /* returns the number of found node review with a given review_id*/
+    public int findReview(Review review)
+    {
+        AtomicInteger count = new AtomicInteger();
+        try ( Session session = driver.session() )
+        {
+            String id = review.getId();
+
+            session.readTransaction((TransactionWork<Integer>) tx -> {
+
+                String query = "MATCH (r:Review) WHERE r.review_id = $id return COUNT(*) AS count";
+                Result result = tx.run(query,parameters("id",id));
+                while(result.hasNext())
+                {
+                    Record r = result.next();
+                    count.set(r.get("count").asInt());
+                }
+                return null;
+            });
+        }
+        return count.get();
+    }
+
+
 
 
 

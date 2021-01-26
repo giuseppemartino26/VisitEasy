@@ -1,15 +1,11 @@
 package it.unipi.dii.inginf.lsdb.group9.visiteasy.persistance;
 
-import com.mongodb.MongoCommandException;
-import com.mongodb.TransactionOptions;
-import com.mongodb.BasicDBObject;
-
+import com.mongodb.*;
 import com.mongodb.client.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.ParseException;
 
 import  java.util.*;
 import java.lang.*;
@@ -25,11 +21,9 @@ import org.bson.conversions.Bson;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
-import javax.print.Doc;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 
 import static com.mongodb.client.model.Accumulators.sum;
 import static com.mongodb.client.model.Filters.*;
@@ -46,35 +40,26 @@ public class MongoManager {
     private final MongoCollection<Document> users;
     private final MongoCollection<Document> doctors;
     private final MongoCollection<Document> administrators;
-    //  private ClientSession clientSession;
+
 
 
     public MongoManager()
     {
         //  mongoClient = MongoClients.create("mongodb://172.16.3.109:27020,172.16.3.110:27020,172.16.3.111:27020/" +
         //         "?retryWrites=true&w=majority&wtimeout=10000");
-        mongoClient = MongoClients.create();
+        ConnectionString uri = new ConnectionString("mongodb://172.16.3.109:27020,172.16.3.110:27020,172.16.3.111:27020");
+        MongoClientSettings mcs = MongoClientSettings.builder().applyConnectionString(uri).readPreference(ReadPreference.nearest()).retryWrites(true).writeConcern(WriteConcern.MAJORITY).readConcern(ReadConcern.MAJORITY).build();
+        mongoClient = MongoClients.create(mcs);
         db = mongoClient.getDatabase("progetto");
         users = db.getCollection("users");
         doctors = db.getCollection("doctors");
-        administrators = db.getCollection("administrator");
-        //   clientSession = mongoClient.startSession();
+        administrators = db.getCollection("administrators");
+
     }
-
-    public MongoClient getMongoClient(){return mongoClient;}
-
-
 
 
     Consumer<Document> printDocuments = document -> {System.out.println(document.toJson());};
     Consumer<Document> printvalue = document -> {System.out.println(document.getString("_id"));};
-    Consumer<Document> printnamedoc = document -> {System.out.println(document.getString("name"));};
-    Consumer<Document> printnum = document -> {System.out.println(document.getInteger("count"));};
-    Consumer<Document> printnum2 = document -> {
-
-        int a = document.getInteger("count");
-
-    };
     InputStreamReader input = new InputStreamReader(System.in);
     BufferedReader tastiera = new BufferedReader(input);
 
@@ -86,6 +71,7 @@ public class MongoManager {
         mongoClient.close();
     }
 
+    /*Ritorna il nome di un dottore il cui username viene passato come parametro*/
     public String getDocName(String docusername)
     {
         Document result = doctors.find(eq("username", docusername)).first();
@@ -98,7 +84,7 @@ public class MongoManager {
         return name;
     }
 
-
+/* Add a new user in the user collection */
     public boolean add_user(User user)
     {
         if (users.countDocuments(new Document("username", user.getUsername())) == 0) {
@@ -108,6 +94,7 @@ public class MongoManager {
         } else return false;
     }
 
+    /* Add a new doctor in the doctor collection */
     public boolean add_doctor(Doctor doctor)
     {
         if (doctors.countDocuments(new Document("username", doctor.getUsername())) == 0) {
@@ -184,7 +171,7 @@ public class MongoManager {
         }
     }
 
-    // ADD ADMINISTRATOR BY ADMINISTRATOR
+    /* adds a new administrator in the administrators collection*/
     public boolean add_administrator(Administrator administrator) {
 
         if (administrators.countDocuments(new Document("username", administrator.getUsername())) == 0) {
@@ -196,20 +183,21 @@ public class MongoManager {
     }
 
 
-
-    public void display_cities() //stampa tutte le città presenti nel DB
+   /* prints all the cities of doctors in the DB*/
+    public void display_cities()
     {
         Bson myGroup = Aggregates.group("$city");
         doctors.aggregate(Arrays.asList(myGroup)).forEach(printvalue);
     }
 
-    public void display_spec() //stampa tutte le specializzazioni dei medici presenti nel DB
+    /* prints all the specializations of doctors in the DB*/
+    public void display_spec()
     {
         Bson myGroup = Aggregates.group("$specialization");
         doctors.aggregate(Arrays.asList(myGroup)).forEach(printvalue);
     }
 
-
+/* Returns the list of doctors of a given city and specialization*/
     public ArrayList<Doctor> getDocByCitySpec(String city, String specialization)
     {
         ArrayList<Doctor> doclist = new ArrayList<>();
@@ -223,6 +211,7 @@ public class MongoManager {
         return doclist;
     }
 
+    /* Returns the list of all doctors in the DB*/
     public ArrayList<Doctor> getAllDoc()
     {
         ArrayList<Doctor> doclist = new ArrayList<>();
@@ -236,7 +225,7 @@ public class MongoManager {
         return doclist;
     }
 
-
+/* Returns the list of cheapest doctors for a given city and specialization*/
     public ArrayList<Doctor> cheapestDoc(String city, String specialization)
     {
         ArrayList<Doctor> doclist = new ArrayList<>();
@@ -246,7 +235,7 @@ public class MongoManager {
             doclist.add(newdoc);
         };
 
-        Bson myMatch = match(and(eq("city",city), eq("specialization", specialization), gte("price", 1)));
+        Bson myMatch = match(and(eq("city",city), eq("specialization", specialization)));
         Bson mySort = sort(ascending("price"));
         Bson myLimit = limit(3);
 
@@ -254,13 +243,7 @@ public class MongoManager {
         return doclist;
     }
 
-  /*  Doctor getDocInfo(String name)
-    {
-        Document result = doctors.find(eq("name", name)).first();
-        Doctor doctor = new Doctor(result.getString("name"),result.getInteger("price"),result.getString("address"),result.getString("bio"));
-        return  doctor;
-    }*/
-
+/* returns a "Doctor" object with all completed fields, giving his username */
     public Doctor getMyProfile(String username)
     {
         Document result = doctors.find(eq("username", username)).first();
@@ -297,7 +280,7 @@ public class MongoManager {
         return true;
     }
 
-    /* Restituisce il documento trovato*/
+    /* Returns the found document in the doctors collection*/
     public Document store(Doctor doctor)
     {
         Document result = new Document();
@@ -312,7 +295,7 @@ public class MongoManager {
 
 
 
-    /* Restituisce una lista di date dalla data start a quella di end*/
+    /* Returns a list of dates from a start date to an end date*/
     public static List<DateTime> getDateRange(DateTime start, DateTime end)
     {
         List<DateTime> ret = new ArrayList<DateTime>();
@@ -322,69 +305,6 @@ public class MongoManager {
             tmp = tmp.plusDays(1);
         }
         return ret;
-    }
-
-    /* Add reservations to the doctor with username = us from a date chosen by the doctor fino a 1 anno o quello che è     ( tutte le date hanno orari uguali che sceglie il dottore) */
-
-
-    /* Elimina tutte le prenotazioni il cui giorno rientra in un range di date, dal calendario dei dottori e dalle prenotazioni degli utenti*/
-    void deleteReservation()
-    {
-        DateTime start = DateTime.now().minusDays(2);
-        DateTime end = start.plusDays(1);
-
-        List<DateTime> between = getDateRange(start, end);
-
-        for (DateTime d : between)
-        {
-            Bson delete = Updates.pull("calendar", new Document("date", d.toString(DateTimeFormat.shortDate())));
-            //  System.out.println(d.toString(DateTimeFormat.shortDate())+" 15.00");
-            Bson deleteu = Updates.pull("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())));
-            doctors.updateMany(new Document(), delete);
-            users.updateMany(new Document(),deleteu);
-        }
-    }
-
-    void deleteReservation2()
-    {
-        DateTime start = DateTime.now();
-        DateTime end = start.plusDays(6);
-
-        List<DateTime> between = getDateRange(start, end);
-
-        ArrayList<String> orari = new ArrayList<>();
-        orari.add(" 09:00");
-        orari.add(" 09:30");
-        orari.add(" 10:00");
-        orari.add(" 10:30");
-        orari.add(" 11:00");
-        orari.add(" 11:30");
-        orari.add(" 12:00");
-        orari.add(" 12:30");
-        orari.add(" 15:00");
-        orari.add(" 15:30");
-        orari.add(" 16:00");
-        orari.add(" 16:30");
-        orari.add(" 17:00");
-        orari.add(" 17:30");
-        orari.add(" 18:00");
-        orari.add(" 18:30");
-
-
-        //List<String> ore = null;
-        //ore.add("15.00");
-
-        for (DateTime d : between)
-        {
-            for (String o: orari)
-            {
-                Bson delete = Updates.pull("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())+o));
-                // System.out.println(d.toString(DateTimeFormat.shortDate())+o);
-                // Bson deleteu = Updates.pull("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())));
-                doctors.updateMany(new Document(), delete);
-                users.updateMany(new Document(), delete);
-            }
-        }
     }
 
     /* Ritorna true se nelle reservations di un dottore c'è uno slot con una certa data e un certo paziente */
@@ -398,7 +318,7 @@ public class MongoManager {
         int b;
         try
         { b = doctors.aggregate(Arrays.asList(match, unwind, match2, count)).first().getInteger("count");
-            System.out.println(b);
+           // System.out.println(b);
         }catch (NullPointerException e){
 
             return false;
@@ -408,7 +328,7 @@ public class MongoManager {
 
     }
 
-    /* Libera una prenotazione*/
+    /*releases a slot/ deletes a reservation, removing it both from users and doctors collection. Used transaction for atomicity of the operation*/
     public void freeSlot(Reservation reservation)
     {
         String doctor = reservation.getDocusername();
@@ -444,22 +364,22 @@ public class MongoManager {
     }
 
 
-
-    /*se lo slot è libero inserisco l'appuntamento sia nella collection doctors che in users */
+/* book a reservation. Used mongoDB transactions*/
     public void book(Reservation reservation)
     {
         String user = reservation.getUsername();
         String date = reservation.getDate();
         String docusername = reservation.getDocusername();
         String docname = reservation.getDocname();
-
+        /* controllo se ho già una prenotazione nella stessa data e ora*/
         if (users.countDocuments(new Document("username",user).append("reservations.date",date)) == 0)
-        {
+        {      /*se lo slot è libero inserisco l'appuntamento sia nella collection doctors che in users */
+
             if (trovato(docusername, date, ""))
             {
                 ClientSession clientSession = mongoClient.startSession();
 
-                try //(ClientSession clientSession = mongoClient.startSession())
+                try
                 {
                     clientSession.startTransaction();
 
@@ -480,33 +400,6 @@ public class MongoManager {
                     clientSession.close();
                 }
 
-
-              /* clientSession = mongoClient.startSession();
-
-                TransactionBody<Void> transactionBody = new TransactionBody<Void>() {
-                    @Override
-                    public Void execute()
-                    {
-
-                        doctors.updateOne(clientSession,new Document("name", name).append("reservations.date", date), Updates.set("reservations.$.patient", user));
-
-                        Document newres = new Document("date", date).append("doctor", name);
-                        users.updateOne(clientSession,eq("username", user), Updates.push("reservations", newres));
-                        return null;
-                    }
-                };
-
-                try {
-
-                    clientSession.withTransaction(transactionBody);
-
-                }catch (RuntimeException e){
-                    System.out.println("ERROR: reservation not done");
-                    return false;
-                }finally {
-                    clientSession.close();
-                }*/
-
             } else {
                 System.out.println("We're sorry :( , the slot is already occupied by another patient, please choose another one.");
             }
@@ -515,6 +408,7 @@ public class MongoManager {
         }
     }
 
+    /* Deletes old reservations*/
     public void deleteDate() {
 
         DateTime start = DateTime.now().minusDays(2);
@@ -552,77 +446,8 @@ public class MongoManager {
 
     }
 
-
-    /* Elimina tutte le prenotazioni il cui giorno rientra in un range di date, dal reservations dei dottori e dalle prenotazioni degli utenti*/
-    public void deleteReservation(String username)
-    {
-
-        ArrayList<String> orari = new ArrayList<>();
-        orari.add("09:00");
-        orari.add("09:30");
-        orari.add("10:00");
-        orari.add("10:30");
-        orari.add("11:00");
-        orari.add("11:30");
-        orari.add("12:00");
-        orari.add("12:30");
-        orari.add("15:00");
-        orari.add("15:30");
-        orari.add("16:00");
-        orari.add("16:30");
-        orari.add("17:00");
-        orari.add("17:30");
-        orari.add("18:00");
-        orari.add("18:30");
-        System.out.println("insert how many days do you want to delete");
-        int day = keyboard.nextInt();
-        DateTime start = DateTime.now();
-        DateTime end = start.plusDays(day);
-
-
-        List<DateTime> between = getDateRange(start, end);
-
-
-        for (DateTime d : between)
-        {
-            for (String o : orari)
-            {
-                Bson delete = new Document ("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())+" "+o).append("patient",""));
-                System.out.println(delete);
-                // Bson delete = delete;
-                doctors.updateMany(new Document(), delete);
-                //users.updateMany(new Document(),delete);
-
-            }
-            //Bson delete = Updates.pull("reservations", new Document("date", d.toString(DateTimeFormat.shortDate())));
-            //doctors.updateMany(new Document(), delete);
-            //users.updateMany(new Document(),delete);
-        }
-    }
-    //aggiunge tutto il calendario a tutti i dottori
-    void aggiungi_cal7() {
-        ArrayList<String> ore = new ArrayList<>();
-        ore.add("09:00");
-        ore.add("11:00");
-        ore.add("15:00");
-        ore.add("16:30");
-
-        DateTime start = DateTime.now();
-        DateTime end = start.plusMonths(2);
-
-        List<DateTime> between = getDateRange(start, end);
-
-        for (DateTime d : between) {
-            for (String o : ore) {
-                Document newres = new Document("date", d.toString(DateTimeFormat.shortDate()) + " " + o).append("patient", "");
-                doctors.updateMany(new Document(), Updates.push("reservations", newres));
-            }
-        }
-
-    }
-
-    //genera calendario dottore inserendo giorni da aggiungere e orari da aggiungere
-    public void aggiungi_cal4(String username) throws IOException, ParseException {
+/* Inserts empty time slots in the array of document "reservation" inside the document a given doctor*/
+    public boolean aggiungi_cal4(String username) throws IOException{
         ArrayList<String> ore = new ArrayList<>();
 
         ArrayList<String> orari = new ArrayList<>();
@@ -643,19 +468,16 @@ public class MongoManager {
         orari.add("18:00");
         orari.add("18:30");
 
-        System.out.println("How many time slots do you want to add?");
+        System.out.println("You can add the availability of new time slots starting from a date of your choice for a certain number of consecutive days");
+        System.out.println("How many time slots per day do you want to add?");
         int hour = keyboard.nextInt();
         int i = 0;
 
-
-
         do {
-
             System.out.println("Available time slots are:\n09:00 - 09:30 - 10:00 - 10:30 - 11:00 - 11:30 - 12:00 - 12:30 "+
                     "\n15:30 - 16:00 - 16:30 - 17:00 - 17:30 - 18:00 - 18:30"+
                     "\nEnter the time slot you want to add as hh:mm: ");
             String orario = tastiera.readLine();
-
 
             if (orari.contains(orario)) {
                 ore.add(orario);
@@ -668,30 +490,38 @@ public class MongoManager {
         } while (i<hour);
 
 
-
         System.out.println("Add the first date as yyyy-MM-dd:   ");
         String date = tastiera.readLine();
         System.out.println("How many days do you want to add?");
         int day = keyboard.nextInt();
         day = day -1;
 
-        DateTime start = DateTime.parse(date);
-        DateTime end = start.plusDays(day);
+        DateTime start;
 
-        List<DateTime> between = getDateRange(start, end);
+        try {
+            start = DateTime.parse(date);
 
-        for (DateTime d : between) {
-            for (String o : ore) {
-                Document newres = new Document("date", d.toString(DateTimeFormat.shortDate()) + " " + o).append("patient", "");
-                doctors.updateMany(new Document("username", username), Updates.push("reservations", newres));
+            DateTime end = start.plusDays(day);
+
+            List<DateTime> between = getDateRange(start, end);
+
+            for (DateTime d : between) {
+                for (String o : ore) {
+                    Document newres = new Document("date", d.toString(DateTimeFormat.shortDate()) + " " + o).append("patient", "");
+                    doctors.updateMany(new Document("username", username), Updates.push("reservations", newres));
+                }
             }
+            return true;
+        }catch (IllegalArgumentException e){
+            System.out.println("ERROR: Date format not valid");
         }
+        return false;
 
     }
 
 
 
-    /* Mostra tutti gli slot disponibili di un dottore */
+    /* Return a list of objects Reservation of all the available slots (only reservations where the value of 'patient' field is empty) of a given doctor */
     public ArrayList<Reservation> showEntirereservations(String usernamedoc)
     {
         ArrayList<Reservation> datelibere = new ArrayList<>();
@@ -710,12 +540,12 @@ public class MongoManager {
         return datelibere;
     }
 
+/* Returns the list of objects Reservation of all the timeslots of a given doctor*/
     public ArrayList<Reservation> showEntirereservationsDoc(String usernamedoc)
     {
         ArrayList<Reservation> datelibere = new ArrayList<>();
         Consumer<Document> printcale = document -> {
 
-            //Reservation reservation = new Reservation(usernamedoc,document.getEmbedded(Arrays.asList("reservations", "date"), String.class, document.getEmbedded(Arrays.asList("reservations", ""), String.class));
             String date = document.getEmbedded(Arrays.asList("reservations", "date"), String.class);
             String patient = document.getEmbedded(Arrays.asList("reservations", "patient"), String.class);
             Reservation reservation = new Reservation(usernamedoc,date,patient);
@@ -731,15 +561,8 @@ public class MongoManager {
     }
 
 
-    /* Mostra il reservations con le prenotazioni di un dottore */
-    public void showreservations(String username) {
 
-        Bson match = match(eq("username",username));
-        Bson unwind = unwind("$reservations");
-        Bson project = project(fields(excludeId(), include("reservations")));
-        doctors.aggregate(Arrays.asList(match,unwind,project)).forEach(printDocuments);
-    }
-
+/* Returns a list of object Reservation related to all the reservations done by a specific user*/
     public ArrayList<Reservation> showUserReservations(String user)
     {
         ArrayList<Reservation> datelist = new ArrayList<>();
@@ -765,26 +588,6 @@ public class MongoManager {
     }
 
 
-    //Analytics svg users
-   /* void printAvgUsers() {
-        Bson group1 = new Document("$group", new Document("_id", new Document("dateofBirth", "$dateofBirth"))
-                .append("age", new Document("$divide", new Document("$subtract", "$dateOfBirth" ))));
-
-        Bson project1 = project(fields(excludeId(), computed("dateofBirth", "$_id.dateofBirth"),
-                include("age")));
-        Document result = aggregate.first();
-double age= result.getDouble("")
-        System.out.println("the average of the age of the user is: ");
-        System.out.println(dateofBirth);*/
-
-//vecchia funzione
-        /*AggregateIterable<org.bson.Document> aggregate = users.aggregate(Arrays.asList(Aggregates.group("_id", new BsonField("averageAge", new BsonDocument("$avg", new BsonString("$age"))))));
-        Document result = aggregate.first();
-        double age = result.getDouble("averageAge");
-        System.out.println("the average of the age of the user is: ");
-        System.out.println(age);
-       }
-        */
 
 
 
@@ -806,66 +609,77 @@ double age= result.getDouble("")
     }
 
 
-        /*public static int calculateAge(LocalDate birthDate, LocalDate currentDate) {
-            int years = Period.between(birthDate, currentDate).getYears();
-            return years;
-        }
-*/
 
+// Analytics: prints the cities where there are more user registred in the application
+    public void printmostcity()
+    {
 
-// mostra la città in cui ci sono più utenti
-
-    public void printmostcity() {
-
-
-
-        Bson unwind = unwind("$city");
         Bson group = group("$city", sum("count", 1L), Accumulators.push("city", "$city"));
         Bson sort = sort(descending("count"));
         Bson limit = limit(3);
         Bson project = project(fields(excludeId(), computed("city", "$_id"), include("count")));
 
+        List<Document> results = users.aggregate(Arrays.asList(group, sort, limit, project)).into(new ArrayList<>());
 
-        List<Document> results = users.aggregate(Arrays.asList(unwind, group, sort, limit, project)).into(new ArrayList<>());
-
-        System.out.println("The three most expensive specialization are: ");
+        System.out.println("Cities where the app is used more: ");
         results.forEach(printDocuments);
 
-
-
     }
 
-
-
-
-    /*void populate_doctors_from_file(String path)
+    /* returns true if a doctor is present in the collection doctors, false if not*/
+    public boolean find(Doctor doctor)
     {
-        List<Document> observationDocuments = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(path));) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                observationDocuments.add(Document.parse(line));
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        doctors.insertMany(observationDocuments);
+        return doctors.countDocuments(new Document("username", doctor.getUsername())) != 0;
     }
-    void populate_users_from_file(String path)
+
+
+    /* update the field bio of a document of a specific doctor in the collection doctors*/
+    public void updateBio(Doctor doctor, String bio)
     {
-        List<Document> observationDocuments = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(path));) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                ((ArrayList<?>) observationDocuments).add(Document.parse(line));
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        users.insertMany(observationDocuments);
+        String username = doctor.getUsername();
+
+        Document result = doctors.find(eq("username", username)).first();
+
+        BasicDBObject newDocument = new BasicDBObject();
+        newDocument.put("bio", bio); // (2)
+
+        BasicDBObject updateObject = new BasicDBObject();
+        updateObject.put("$set", newDocument); // (3)
+
+        db.getCollection("doctors").updateOne(result, updateObject);
+
+
     }
-    public void populate_doctors_from_file() {
+
+    /* update the field address of a document of a specific doctor in the collection doctors*/
+    public void updateAddress(Doctor doctor, String address){
+
+        String username = doctor.getUsername();
+        Document result = doctors.find(eq("username", username)).first();
+
+        BasicDBObject newDocument = new BasicDBObject();
+        newDocument.put("address", address); // (2)
+
+        BasicDBObject updateObject = new BasicDBObject();
+        updateObject.put("$set", newDocument); // (3)
+
+        db.getCollection("doctors").updateOne(result, updateObject);
     }
-    public void populate_users_from_file() {
-    }*/
+
+    /* update the field price of a document of a specific doctor in the collection doctors*/
+    public void updatePrice(Doctor doctor, int price){
+
+        String username = doctor.getUsername();
+        Document result = doctors.find(eq("username", username)).first();
+
+        BasicDBObject newDocument = new BasicDBObject();
+        newDocument.put("price", price); // (2)
+
+        BasicDBObject updateObject = new BasicDBObject();
+        updateObject.put("$set", newDocument); // (3)
+
+        db.getCollection("doctors").updateOne(result, updateObject);
+    }
+
+
 }

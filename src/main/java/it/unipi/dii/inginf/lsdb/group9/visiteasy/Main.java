@@ -1,7 +1,5 @@
 package it.unipi.dii.inginf.lsdb.group9.visiteasy;
 
-import com.mongodb.client.ClientSession;
-import com.mongodb.client.TransactionBody;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.*;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.persistance.MongoManager;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.persistance.Neo4jManager;
@@ -13,9 +11,7 @@ import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Administrator;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Reservation;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.User;
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.Doctor;
-import it.unipi.dii.inginf.lsdb.group9.visiteasy.utils.Methods;
 import java.io.*;
-import java.text.ParseException;
 import  java.util.*;
 import java.util.concurrent.*;
 
@@ -24,19 +20,15 @@ import java.util.concurrent.*;
 
 public class Main {
 
-    private static MongoManager mdb = new MongoManager();
+    private static final MongoManager mdb = new MongoManager();
     private static Scanner keyboard = new Scanner(System.in);
-    //   private static Neo4jManager ndb = new Neo4jManager("bolt://172.16.3.110:7687", "neo4j", "root2");
-    private static Neo4jManager ndb = new Neo4jManager("neo4j://localhost:11003", "neo4j", "root");
+    private static Neo4jManager ndb = new Neo4jManager("bolt://172.16.3.110:7687", "neo4j", "root2");
+    //private static Neo4jManager ndb = new Neo4jManager("neo4j://localhost:11003", "neo4j", "root");
 
 
 
     private static InputStreamReader input = new InputStreamReader(System.in);
     private static BufferedReader tastiera = new BufferedReader(input);
-
-    static Methods methods = new Methods();
-
-
 
 
 
@@ -68,19 +60,6 @@ public class Main {
 
             switch (option) {
 
-                case "9":
-                     /*   Review review234 = new Review("5ff0c5ebb7e95313fd8d78a5");
-                        ndb.deleteReview(review234); */
-
-                    Doctor doctor234 = new Doctor("5fe8ade83a65753d7c4b4667","");
-                    ndb.deleteDoctor(doctor234);
-                     /*  Document docc = mdb.store(doctor234);
-                       System.out.println(docc.getString("name")); */
-                    // System.out.println(ndb.findNode(doctor234));
-
-
-                    System.out.println("FATTO");
-
                 case "1":
 
                     System.out.println("--DOCTOR--\nWhat do you want to do? " +
@@ -111,31 +90,87 @@ public class Main {
                                                 "\n2. [ADD DATES TO CALENDAR]" +
                                                 "\n3. [SHOW MY PROFILE]" +
                                                 "\n4. [SHOW REVIEWS]" +
-
+                                                "\n5. [UPDATE MY PROFILE]"+
                                                 "\n\n0. [Shut down the application]");
 
 
                                         String option_doctor2 = tastiera.readLine();
                                         switch (option_doctor2) {
                                             case "1":
-                                                //see doctor's reservations
-                                                // mdb.showreservations(usernameD);
-                                                Methods.printResDoc(usernameD);
+
+                                                ArrayList<Reservation> list = mdb.showEntirereservationsDoc(usernameD);
+                                                if (!Methods.printResDoc(list))
+                                                {
+                                                    System.out.println("You don't have any reservations yet");
+                                                    continue;
+                                                }
                                                 break;
                                             case "2":
                                                 // a new doctor create the reservations
-                                                mdb.aggiungi_cal4(usernameD);
+                                                if (!mdb.aggiungi_cal4(usernameD))
+                                                {
+                                                    continue;
+                                                }
                                                 System.out.println("New dates added successfully!");
                                                 break;
 
                                             case "3":
                                                 //stampa le sue informazioni
-                                                Methods.printMyProfile(usernameD);
+                                                Doctor doctor2 = mdb.getMyProfile(usernameD);
+                                                System.out.println(doctor2.getName()+"\nName: "+doctor2.getName()+"\nAddress: "+doctor2.getAddress()+"\nprice : "+doctor2.getPrice()+"€"+"\nBiography: "+doctor2.getBio());
+
                                                 break;
                                             case"4":
+                                                Doctor doctor3 = new Doctor(usernameD,"");
+                                                ArrayList<Review> reviews = ndb.showReviews3(doctor3);
 
-                                                Methods.printreviews(doctor);
+                                                Methods.printreviews(reviews);
                                                 break;
+
+                                            case "5":
+                                                while(true) {
+                                                    System.out.print("\n1. [MODIFY BIO]" +
+                                                            "\n2. [UPDATE ADDRESS]" +
+                                                            "\n3. [UPDATE PRICE]\n");
+
+                                                    String op = tastiera.readLine();
+                                                    switch (op){
+
+                                                        case "1":
+                                                            System.out.println("\nWrite something new about your bio: ");
+                                                            String bio = tastiera.readLine();
+
+                                                            mdb.updateBio(doctor, bio);
+                                                            System.out.println("Bio updated correctly!");
+                                                            break;
+
+
+
+                                                        case "2":
+                                                            System.out.println("Update your address: ");
+                                                            String address = tastiera.readLine();
+
+                                                            mdb.updateAddress(doctor, address);
+                                                            System.out.println("Address updated correctly!");
+                                                            break;
+
+                                                        case "3":
+                                                            System.out.println("Insert the new price:");
+                                                            int newprice = Integer.parseInt(tastiera.readLine());
+
+                                                            mdb.updatePrice(doctor,newprice);
+                                                            System.out.println("Price updated correctly!");
+                                                            break;
+
+                                                        default:
+                                                            System.out.println("Please, select a correct command.");
+                                                            continue;
+
+
+                                                    }break;
+                                                }break;
+
+
 
                                             case "0":
                                                 mdb.closeconnection();
@@ -146,7 +181,7 @@ public class Main {
 
                                             default:
                                                 System.out.println("Please, select a correct command.");
-                                                continue;
+
                                         }
                                     }
 
@@ -238,7 +273,7 @@ public class Main {
                                                     "\n2. [SHOW YOUR RESERVATIONS]" +
                                                     "\ne. [SHUT DOWN THE APPLICATION]");
                                             String com = tastiera.readLine();
-
+                                            out:
                                             switch (com) {
 
                                                 case "1":
@@ -264,20 +299,36 @@ public class Main {
                                                                 "\n3. [SHOW BEST DOCTORS RECOMMENDED BY THE SYSTEM]");
 
                                                         String sort = tastiera.readLine();
+                                                        ArrayList<Doctor> doclist = new ArrayList<>();
 
 
                                                         switch (sort)
                                                         {
                                                             case "1":
-                                                                Methods.printAllDocList(city, specialization);
+
+                                                                doclist = mdb.getDocByCitySpec(city, specialization);
+                                                                if (!Methods.printAllDocList(city, specialization,doclist))
+                                                                {
+                                                                    System.out.println("There are no doctor for this city and specialization");
+                                                                    break out;
+                                                                }
                                                                 break;
 
                                                             case "2":
-                                                                Methods.printCheapestDocList(city, specialization);
+                                                                doclist = mdb.cheapestDoc(city,specialization);
+                                                                if (!Methods.printCheapestDocList(city, specialization,doclist))
+                                                                {
+                                                                    System.out.println("There are no doctor for this city and specialization");
+                                                                    break out;
+                                                                }
                                                                 break;
 
                                                             case "3":
-                                                                ndb.recommendedDoctors(city, specialization);
+                                                                if (ndb.recommendedDoctors(city, specialization) == 0)
+                                                                {
+                                                                    System.out.println("The system has not found any \"best doctor\" for this city and specialization, please try to search in the entire list if you want to find one");
+                                                                    break out;
+                                                                }
                                                                 break;
 
                                                             default:
@@ -290,7 +341,10 @@ public class Main {
 
                                                     String usernamedoc = tastiera.readLine();
 
-                                                    Methods.printMyProfile(usernamedoc);
+
+                                                    Doctor doctor3 = mdb.getMyProfile(usernamedoc);
+                                                    System.out.println(doctor3.getName()+"\nName: "+doctor3.getName()+"\nAddress: "+doctor3.getAddress()+"\nprice : "+doctor3.getPrice()+"€"+"\nBiography: "+doctor3.getBio());
+
 
 
 
@@ -304,12 +358,15 @@ public class Main {
 
 
                                                         String book = tastiera.readLine();
+                                                        ArrayList<Reservation> list = new ArrayList<>();
+
 
                                                         switch (book)
                                                         {
                                                             case "1": //book
 
-                                                                Methods.printSlots(usernamedoc);
+                                                                list = mdb.showEntirereservations(usernamedoc);
+                                                                Methods.printSlots(list);
 
                                                                 System.out.println("Insert the datetime of the reservation you want to book");
 
@@ -322,7 +379,10 @@ public class Main {
 
                                                             case "2": //view all reviews
                                                                 Doctor doctor = new Doctor(usernamedoc,"");
-                                                                Methods.printreviews(doctor);
+                                                                ArrayList<Review> reviews = ndb.showReviews3(doctor);
+                                                                if (!Methods.printreviews(reviews)){
+                                                                    continue;
+                                                                }
 
                                                                 System.out.println("Type 1 if you want to add a like to a review or press another key to come back");
                                                                 String like = tastiera.readLine();
@@ -330,8 +390,14 @@ public class Main {
                                                                 if (like.equals("1")){
                                                                     System.out.println("Insert the review_id:");
                                                                     String rid = tastiera.readLine();
+
                                                                     User user1 = new User(user.getUsername());
                                                                     Review review = new Review(rid);
+                                                                    if (ndb.findReview(review) == 0)
+                                                                    {
+                                                                        System.out.println("Does not exist a review with this id");
+                                                                        continue;
+                                                                    }
                                                                     ndb.like(user1,review);
                                                                     System.out.println("A like was added to this review");
                                                                     continue;
@@ -374,8 +440,14 @@ public class Main {
                                                     break;
 
                                                 case "2":
+                                                    ArrayList<Reservation> list = new ArrayList<>();
+                                                    list = mdb.showUserReservations(username);
 
-                                                    Methods.printUserRes(username);
+                                                    if (!Methods.printUserRes(list))
+                                                    {
+                                                        System.out.println("You don't have any reservations");
+                                                        continue;
+                                                    }
 
                                                     System.out.println("Type 1 if you want to delete a reservation or press any key to return to the user page");
                                                     String d = tastiera.readLine();
@@ -439,30 +511,10 @@ public class Main {
                                     String password = tastiera.readLine();
                                     System.out.println("Insert city");
                                     String city = tastiera.readLine();
-                                       /* System.out.println("Insert your date of birth nel formato dd-MM-yyyy");
-                                        String d = tastiera.readLine();
-                                        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-                                        sdf.setLenient(false); // strict parsing
-
-                                        Date dateofBirth = null;
-
-                                            dateofBirth = sdf.parse(d);
 
 
-                                            GregorianCalendar cal = new GregorianCalendar();
-                                            cal.setTime(dateofBirth);
-
-                                            int giorno = cal.get(Calendar.DAY_OF_MONTH);
-                                            int mese = cal.get(Calendar.MONTH) + 1;
-                                            int anno = cal.get(Calendar.YEAR);
-
-                                            if(giorno>31|| mese>13|| anno>2002){
-                                                System.out.println("ERROR: Insert right date");
-                                                break;
-                                            }
 
 
-*/
 
                                     User user = new User(username, password, city);
                                     if (!mdb.add_user(user)) {
@@ -474,6 +526,7 @@ public class Main {
 
 
                                 }
+                                break;
 
 
                             case "0":
@@ -601,7 +654,7 @@ public class Main {
                                                 System.out.println("--ADMINISTRATOR--\nSelect a command: " +
                                                         "\n1. [SHOW CITIES WITH MORE USERS]" +
                                                         "\n2. [SHOW MOST EXPENSIVE SPECIALIZATIONS]" +
-                                                        "\n3. [SHOW ACTIVE REVIEWERS]" +
+                                                        // "\n3. [SHOW ACTIVE REVIEWERS]" +  FUNZIONA SOLO IN LOCALE: NON SIAMO RIUSCITI A INSTALLARE IL PLUGIN APOC SULLA VM
                                                         "\n4. [SHOW BEST REVIEWERS]" +
                                                         "\n\n0. Go back" );
                                                 String analytics_adm = tastiera.readLine();
@@ -609,14 +662,14 @@ public class Main {
                                                 switch (analytics_adm) {
                                                     case "1":
                                                         mdb.printmostcity();
-                                                        // mdb.printAvgUsers();
+
                                                         break;
                                                     case "2":
                                                         mdb.printMostExpSpec();
                                                         break;
-                                                    case "3":
+                                                  /*  case "3":
                                                         ndb.printActiveReviewers();
-                                                        break;
+                                                        break; */
                                                     case "4":
                                                         ndb.printBestReviewers();
                                                         break;
@@ -629,14 +682,20 @@ public class Main {
                                                 break;
 
                                             case "4":
-                                                Methods.printAllDocList2();
+                                                ArrayList<Doctor> doclist = new ArrayList<>();
+                                                doclist = mdb.getAllDoc();
+
+                                                Methods.printAllDocList2(doclist);
 
                                                 System.out.println("Insert the doctors \"us\" that you want to see");
 
                                                 String usernamedoc = tastiera.readLine();
 
+
                                                 try {
-                                                    Methods.printMyProfile(usernamedoc);
+                                                    Doctor doctorD = mdb.getMyProfile(usernamedoc);
+                                                    System.out.println(doctorD.getName()+"\nName: "+doctorD.getName()+"\nAddress: "+doctorD.getAddress()+"\nprice : "+doctorD.getPrice()+"€"+"\nBiography: "+doctorD.getBio());
+
                                                 }catch (NullPointerException e){
                                                     System.out.println("ERROR: Not found a doctor with the selected us");
                                                     continue;
@@ -645,7 +704,10 @@ public class Main {
                                                 System.out.println("------REVIEWS-------");
 
                                                 Doctor doctor2 = new Doctor(usernamedoc,"");
-                                                Methods.printreviews(doctor2);
+                                                ArrayList<Review> reviews = new ArrayList<>();
+                                                reviews = ndb.showReviews3(doctor2);
+
+                                                Methods.printreviews(reviews);
 
                                                 System.out.println("Select :" +
                                                         "\n1. [DELETE THE DOCTOR]" +
@@ -666,15 +728,22 @@ public class Main {
 
                                                             if (!mdb.delete_doctor_by_the_administrator(doctor2)) {
                                                                 System.out.println("Username not found. Please choose another one.");
-                                                            } else {
-                                                                ndb.deleteDoctor(doctor2);
+                                                                continue;
+                                                            } else
+                                                            {
+                                                                if (mdb.find(doctor2)){
+                                                                    //doctor not removed from mongo
+                                                                    System.out.println("ERROR: Please retry");
+                                                                    continue;
+                                                                }
+                                                                ndb.deleteDoctor(doctor2); //elimino da neo4j
                                                                 if (ndb.findNode(doctor2) == 1) //delete fallita su neo4j
                                                                 {
                                                                     mdb.addDocument(store); //riaggiungo su mongo
                                                                 }
 
                                                                 System.out.println("DOCTOR deleted successfully!");
-                                                                break;
+                                                                // break;
                                                             }
                                                             break;
 
@@ -739,7 +808,7 @@ public class Main {
 
                             }
                         case "0":
-                            // go back to doctor, user, admin
+
 
                             continue;
                     }

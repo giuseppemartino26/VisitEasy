@@ -1,76 +1,53 @@
 package it.unipi.dii.inginf.lsdb.group9.visiteasy.utils;
 
 import it.unipi.dii.inginf.lsdb.group9.visiteasy.entities.*;
-import it.unipi.dii.inginf.lsdb.group9.visiteasy.persistance.MongoManager;
-import it.unipi.dii.inginf.lsdb.group9.visiteasy.persistance.Neo4jManager;
-import org.joda.time.DateTime;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+
 
 public class Methods {
 
-    private static MongoManager mdb = new MongoManager();
-    private static Neo4jManager ndb = new Neo4jManager("neo4j://localhost:11003", "neo4j", "root");
-    // private static Neo4jManager ndb = new Neo4jManager("bolt://172.16.3.110:7687", "neo4j", "root2");
-    private static Scanner keyboard = new Scanner(System.in);
-    InputStreamReader input = new InputStreamReader(System.in);
-    BufferedReader tastiera = new BufferedReader(input);
-
-
-
-    public static void printAllDocList(String city, String spec)
+    public static boolean printAllDocList(String city, String spec,ArrayList<Doctor> doclist)
     {
-        ArrayList<Doctor> doclist = new ArrayList<>();
-        doclist = mdb.getDocByCitySpec(city, spec);
+        if (doclist.size() == 0)
+        {
+            return false;
+        }
 
         System.out.println("----List of all "+spec+" of "+city+"----");
 
-        for (int i = 0; i < doclist.size(); i++)
-        {
-            System.out.println(doclist.get(i).getName()+" us:"+doclist.get(i).getUsername());
+        for (Doctor doctor : doclist) {
+            System.out.println(doctor.getName() + " us:" + doctor.getUsername());
         }
+        return true;
     }
 
-
-    public static void printAllDocList2()
+    public static boolean printCheapestDocList(String city, String spec, ArrayList<Doctor> doclist)
     {
-        ArrayList<Doctor> doclist = new ArrayList<>();
-        doclist = mdb.getAllDoc();
-
-        System.out.println("----List of all doctors----");
-
-        for (int i = 0; i < doclist.size(); i++)
+        if (doclist.size() == 0)
         {
-            System.out.println(doclist.get(i).getName()+" us:"+doclist.get(i).getUsername());
+            return false;
         }
-    }
-
-
-    public static void printCheapestDocList(String city, String spec)
-    {
-        ArrayList<Doctor> doclist = new ArrayList<>();
-        doclist = mdb.cheapestDoc(city,spec);
 
         System.out.println("----List of top 3 cheapest "+spec+" of "+city+"----");
 
-        for (int i = 0; i < doclist.size(); i++)
-        {
-            System.out.println("us: "+doclist.get(i).getUsername()+"  "+doclist.get(i).getName()+"   Price of the medical examination: "+doclist.get(i).getPrice()+"€");
+        for (Doctor doctor : doclist) {
+            System.out.println("us: " + doctor.getUsername() + "  " + doctor.getName() + "   Price of the medical examination: " + doctor.getPrice() + "€");
+        }
+        return true;
+    }
+
+
+    public static void printAllDocList2(ArrayList<Doctor> doclist)
+    {
+        System.out.println("----List of all doctors----");
+
+        for (Doctor doctor : doclist) {
+            System.out.println(doctor.getName() + " us:" + doctor.getUsername());
         }
     }
 
-
-    public static void printMyProfile(String username)
-    {
-        Doctor doctor = mdb.getMyProfile(username);
-        System.out.println(doctor.getName()+"\nName: "+doctor.getName()+"\nAddress: "+doctor.getAddress()+"\nprice : "+doctor.getPrice()+"€"+"\nBiography: "+doctor.getBio());
-    }
 
 
     public static void printCurrentDate(){
@@ -81,42 +58,42 @@ public class Methods {
         System.out.println(dtf.format(now));
     }
 
-    public static void printSlots(String name){
-        ArrayList<Reservation> list = new ArrayList<>();
-        list = mdb.showEntirereservations(name);
+    public static void printSlots(ArrayList<Reservation> list)
+    {
 
         System.out.println("---ALL AVAIABLE SLOTS---");
-        for (int i = 0; i < list.size(); i++)
-        {
-            System.out.println(list.get(i).getDate());
+        for (Reservation reservation : list) {
+            System.out.println(reservation.getDate());
         }
     }
 
 
 
-    public static void printUserRes(String name){
-        ArrayList<Reservation> list = new ArrayList<>();
-        list = mdb.showUserReservations(name);
+    public static boolean printUserRes(ArrayList<Reservation> list)
+    {
+        if (list.size() == 0){
+            return false;
+        }
 
         System.out.println("---MY RESERVATIONS---");
-        for (int i = 0; i < list.size(); i++)
-        {
-            System.out.println("Date: "+list.get(i).getDate()+" Doctor us: "+list.get(i).getDocusername()+" Doctor name: "+list.get(i).getDocname());
+        for (Reservation reservation : list) {
+            System.out.println("Date: " + reservation.getDate() + " Doctor us: " + reservation.getDocusername() + " Doctor name: " + reservation.getDocname());
         }
+        return true;
     }
 
-    public static void printreviews(Doctor doctor)
+    public static boolean printreviews(ArrayList<Review> reviews)
     {
-        ArrayList<Review> reviews = ndb.showReviews3(doctor);
-
         if (reviews.size() > 0) {
-            for (int i = 0; i < reviews.size(); i++) {
+            for (Review review : reviews) {
                 System.out.println("===================================================================================\n" +
-                        "id_review:" + reviews.get(i).getId() + "\n" + reviews.get(i).getDateTime() + "\n" + reviews.get(i).getUsername() + "\nRating:" + reviews.get(i).getRating() + "\n" + reviews.get(i).getText() + "\nNumber of likes: " + reviews.get(i).getNumLikes());
+                        "id_review:" + review.getId() + "\n" + review.getDateTime() + "\n" + review.getUsername() + "\nRating:" + review.getRating() + "\n" + review.getText() + "\nNumber of likes: " + review.getNumLikes());
             }
         }else {
             System.out.println("The doctor doesn't have any reviews yet");
+            return false;
         }
+        return true;
     }
 
     public static String getAlphaNumericString(int n)
@@ -143,15 +120,17 @@ public class Methods {
     }
 
 
-    public static void printResDoc(String name){
-        ArrayList<Reservation> list = new ArrayList<>();
-        list = mdb.showEntirereservationsDoc(name);
+    public static boolean printResDoc(ArrayList<Reservation> list){
+        if (list.size() == 0)
+        {
+            return false;
+        }
 
         System.out.println("---RESERVATIONS---");
-        for (int i = 0; i < list.size(); i++)
-        {
-            System.out.println(list.get(i).getDate()+"      patient: "+list.get(i).getUsername());
+        for (Reservation reservation : list) {
+            System.out.println(reservation.getDate() + "      patient: " + reservation.getUsername());
         }
+        return true;
     }
 
 
